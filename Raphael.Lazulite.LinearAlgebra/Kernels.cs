@@ -1,9 +1,9 @@
 ﻿using ILGPU;
 using ILGPU.Runtime;
 
-namespace Raphael.Lazulite.Suite;
+namespace Raphael.Lazulite.LinearAlgebra;
 
-public partial class LinearAlgebra
+public partial class LinearAlgebraSuite
 {
     #region Elementwise Kernels
     #region Binary

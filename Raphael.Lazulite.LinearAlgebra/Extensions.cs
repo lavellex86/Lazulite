@@ -1,7 +1,7 @@
 ﻿using ILGPU;
 using ILGPU.Runtime;
 
-namespace Raphael.Lazulite.Suite;
+namespace Raphael.Lazulite.LinearAlgebra;
 
 public static class AcceleratedTensorExtensions
 {

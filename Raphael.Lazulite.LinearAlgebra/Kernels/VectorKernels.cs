@@ -1,9 +1,9 @@
 ﻿using ILGPU;
 using ILGPU.Runtime;
 
-namespace Raphael.Lazulite.Suite;
+namespace Raphael.Lazulite.LinearAlgebra;
 
-public static partial class LinearAlgebra
+public static partial class LinearAlgebraSuite
 {
     public static void OuterProductKernelImpl(
         Index1D index,

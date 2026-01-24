@@ -3,9 +3,9 @@ using ILGPU.Algorithms;
 using ILGPU.Algorithms.ScanReduceOperations;
 using ILGPU.Runtime;
 
-namespace Raphael.Lazulite.Suite;
+namespace Raphael.Lazulite.LinearAlgebra;
 
-public partial class LinearAlgebra
+public partial class LinearAlgebraSuite
 {
     public static void Sum(ArrayView1D<float, Stride1D.Dense> result, ArrayView1D<float, Stride1D.Dense> a)
     {

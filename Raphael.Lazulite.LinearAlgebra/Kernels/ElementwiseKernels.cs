@@ -2,9 +2,9 @@
 using ILGPU.Algorithms;
 using ILGPU.Runtime;
 
-namespace Raphael.Lazulite.Suite;
+namespace Raphael.Lazulite.LinearAlgebra;
 
-public static partial class LinearAlgebra
+public static partial class LinearAlgebraSuite
 {
     #region Binary
     public static void AddKernelImpl(

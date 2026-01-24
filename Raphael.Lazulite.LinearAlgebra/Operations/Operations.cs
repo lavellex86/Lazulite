@@ -2,9 +2,9 @@
 using ILGPU.Runtime;
 using ILGPU.Runtime.Cuda;
 
-namespace Raphael.Lazulite.Suite;
+namespace Raphael.Lazulite.LinearAlgebra;
 
-public partial class LinearAlgebra
+public partial class LinearAlgebraSuite
 {
     private readonly static Dictionary<int, CuBlas?> _cublasHandles = [];
 

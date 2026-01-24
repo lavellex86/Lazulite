@@ -1,6 +1,6 @@
-﻿namespace Raphael.Lazulite.Suite;
+﻿namespace Raphael.Lazulite.LinearAlgebra;
 
-public partial class LinearAlgebra
+public partial class LinearAlgebraSuite
 {
     public static AcceleratedTensor<T> Add<T>(AcceleratedTensor<T> a, AcceleratedTensor<T> b) where T : notnull => a.CreateAlike(Add(a.Data, b.Data));
     public static AcceleratedTensor<T> Subtract<T>(AcceleratedTensor<T> a, AcceleratedTensor<T> b) where T : notnull => a.CreateAlike(Subtract(a.Data, b.Data));
