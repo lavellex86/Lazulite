@@ -4,9 +4,15 @@ using ILGPU.Runtime;
 
 namespace Raphael.Lazulite;
 
-public class BufferPool<T> : IBufferPool where T : unmanaged
+public class BufferPool<T> : IBufferPool, IDisposable where T : unmanaged
 {
     private readonly ConcurrentDictionary<int, ConcurrentDictionary<int, ConcurrentStack<MemoryBuffer1D<T, Stride1D.Dense>>>> _pool = [];
+
+    public BufferPool()
+    {
+        foreach (var aidx in Compute.Accelerators.Keys) _pool[aidx] = [];
+        Compute.BufferPoolHooks.Add(this);
+    }
     
     public void ClearAll()
     {
@@ -52,12 +58,16 @@ public class BufferPool<T> : IBufferPool where T : unmanaged
         return buffer;
     }
 
-    public void AddAccelerator(int aidx) => _pool[aidx] = [];
+    public void Dispose()
+    {
+        foreach (var kvp in _pool) 
+        foreach (var stack in kvp.Value.Values) 
+            while (stack.TryPop(out var buffer)) buffer.Dispose();
+    }
 }
 
 public interface IBufferPool
 {
-    public void AddAccelerator(int aidx);
     public void ClearAll();
     public void ClearAt(int aidx);
 }

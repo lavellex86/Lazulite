@@ -6,7 +6,6 @@ namespace Raphael.Lazulite;
 public abstract class Value<TData, THost>(MemoryBuffer1D<TData, Stride1D.Dense> data)
     where TData : unmanaged where THost : notnull
 {
-
     public MemoryBuffer1D<TData, Stride1D.Dense> Data { get; } = data;
     public int TotalSize { get; } = (int)data.Length;
 
@@ -29,14 +28,11 @@ public abstract class Value<TData, THost>(MemoryBuffer1D<TData, Stride1D.Dense> 
         Pool.Return(Data);
         WasDisposed = true;
     }
-
-    public Value<TData, THost> Zeros() => Create(Pool.GetLike(Data));
-    public Value<TData, THost> Clone() => Create(Pool.GetLike(Data).Copy(Data));
-    public Value<TData, THost> CreateAlike(MemoryBuffer1D<TData, Stride1D.Dense> buffer) => Create(buffer);
+    public void Return() => Pool.Return(Data);
 
     public abstract BufferPool<TData> Pool { get; }
     public abstract THost Unroll(TData[] rolled);
     public abstract TData[] Roll(THost value);
-    public abstract Value<TData, THost> Create(MemoryBuffer1D<TData, Stride1D.Dense> buffer);
-    public abstract void Return();
+    
+    public static implicit operator MemoryBuffer1D<TData, Stride1D.Dense>(Value<TData, THost> value) => value.Data;
 }

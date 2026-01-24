@@ -26,32 +26,27 @@ public static class ArrayViewExtensions
 
 public static class ValueExtensions
 {
-    public static ScalarValue AsScalar(this Value<,> value) => new(value.Data);
-    public static VectorValue AsVector(this Value<,> value) => new(value.Data);
-    public static VectorValue AsVector(this Value<,> value) => new(value.Data);
-    public static MatrixValue AsMatrix(this Value<,> value) => new(value.Data, value.Shape);
-    public static TensorValue3 AsTensorValue3(this Value<,> value) => new(value.Data, value.Shape);
+    public static BufferPool<float> FloatPool { get; } = new();
+    public static BufferPool<double> DoublePool { get; } = new();
+    public static BufferPool<int> IntPool { get; } = new();
+    public static BufferPool<long> LongPool { get; } = new();
+    public static BufferPool<byte> BytePool { get; } = new();
 
-    public static Value<,> NonDisposable<T>(this Value<,> value) where T : notnull
+    public static Value<TData, THost> NonDisposable<TData, THost>(this Value<TData, THost> value) where TData : unmanaged where THost : notnull
     {
         value.Disposable = false;
         return value;
     }
 
-    public static Value<,> Disposable<T>(this Value<,> value) where T : IDisposable
+    public static Value<TData, THost> Disposable<TData, THost>(this Value<TData, THost> value) where TData : unmanaged where THost : notnull
     {
         value.Disposable = true;
         return value;
     }
     
-    public static Value<,> Set<T>(this Value<,> value, Value<,> data) where T : notnull
+    public static Value<TData, THost> Set<TData, THost>(this Value<TData, THost> value, Value<TData, THost> data) where TData : unmanaged where THost : notnull
     {
         value.UpdateWith(data);
         return value;
     }
-}
-
-public static class ArrayExtensions
-{
-    public static float[] ToFloats(this int[] ints) => ints.Select(i => (float)i).ToArray();
 }

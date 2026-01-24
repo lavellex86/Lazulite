@@ -14,13 +14,7 @@ public static partial class Compute
     public static ConcurrentDictionary<string, int> AcceleratorIndices { get; } = [];
     public static Context Context { get; }
     
-    public static BufferPool<float> FloatPool { get; } = new();
-    public static BufferPool<double> DoublePool { get; } = new();
-    public static BufferPool<int> IntPool { get; } = new();
-    public static BufferPool<long> LongPool { get; } = new();
-    public static BufferPool<byte> BytePool { get; } = new();
-
-    public static List<IBufferPool> Pools => [FloatPool, DoublePool, IntPool, LongPool, BytePool];
+    internal static List<IDisposable> BufferPoolHooks { get; } = [];
 
     private static bool _disposed;
     #endregion
@@ -42,8 +36,6 @@ public static partial class Compute
             Accelerators[aidx] = device.CreateAccelerator(Context);
             AcceleratorIndices[Accelerators[aidx].Name] = aidx;
             
-            foreach (var pool in Pools) pool.AddAccelerator(aidx);
-            
             aidx++;
         }
         InitializeCuBlas();
@@ -52,14 +44,6 @@ public static partial class Compute
     }
 
     #region Management
-    public static void ClearAll()
-    {
-        foreach (var pool in Pools) pool.ClearAll();
-    }
-    public static void ClearAt(int aidx)
-    {
-        foreach (var pool in Pools) pool.ClearAt(aidx);
-    }
     #region Synchronization
     public static void Synchronize(int aidx) => Accelerators[aidx].Synchronize();
 
@@ -72,7 +56,7 @@ public static partial class Compute
     {
         if (_disposed) return;
         GC.WaitForPendingFinalizers();
-        ClearAll();
+        foreach (var pool in BufferPoolHooks) pool.Dispose();
         Context.Dispose();
         foreach (var accelerator in Accelerators.Values) accelerator.Dispose();
         foreach (var blas in _cublasHandles.Values) blas?.Dispose();
