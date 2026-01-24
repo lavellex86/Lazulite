@@ -38,7 +38,6 @@ public static partial class Compute
             
             aidx++;
         }
-        InitializeCuBlas();
         
         AppDomain.CurrentDomain.ProcessExit += (_, _) => Dispose();
     }
@@ -59,8 +58,6 @@ public static partial class Compute
         foreach (var pool in BufferPoolHooks) pool.Dispose();
         Context.Dispose();
         foreach (var accelerator in Accelerators.Values) accelerator.Dispose();
-        foreach (var blas in _cublasHandles.Values) blas?.Dispose();
-        CleanupCuBlas();
         _disposed = true;
     }
     #endregion

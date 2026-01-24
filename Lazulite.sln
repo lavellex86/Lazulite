@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raphael.Lazulite", "Raphael
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing", "Testing\Testing.csproj", "{FAD0EDA5-5B1E-4801-B172-D63DD73E8B9F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raphael.Lazulite.LinearAlgebra", "Raphael.Lazulite.LinearAlgebra\Raphael.Lazulite.LinearAlgebra.csproj", "{EBB5417B-F80C-479E-8E98-EF97DA192A5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{FAD0EDA5-5B1E-4801-B172-D63DD73E8B9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAD0EDA5-5B1E-4801-B172-D63DD73E8B9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAD0EDA5-5B1E-4801-B172-D63DD73E8B9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBB5417B-F80C-479E-8E98-EF97DA192A5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBB5417B-F80C-479E-8E98-EF97DA192A5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBB5417B-F80C-479E-8E98-EF97DA192A5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBB5417B-F80C-479E-8E98-EF97DA192A5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
