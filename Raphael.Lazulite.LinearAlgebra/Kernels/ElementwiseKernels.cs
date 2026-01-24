@@ -6,6 +6,19 @@ namespace Raphael.Lazulite.LinearAlgebra;
 
 public static partial class LinearAlgebraSuite
 {
+    private static void FillKernelImpl(Index1D index, ArrayView1D<float, Stride1D.Dense> view, float value) => view[index] = value;
+    private static void ConcatKernelImpl(Index1D index, ArrayView1D<float, Stride1D.Dense> result, ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b)
+    {
+        if (index < a.Length)
+            result[index] = a[index];
+        else
+            result[index] = b[index - a.Length];
+    }
+    private static void SliceKernelImpl(Index1D index, ArrayView1D<float, Stride1D.Dense> dest, ArrayView1D<float, Stride1D.Dense> source, int start, int end)
+    {
+        if (index >= start && index < end) dest[index - start] = source[index];
+    }
+    
     #region Binary
     public static void AddKernelImpl(
         Index1D index, 

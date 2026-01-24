@@ -45,6 +45,13 @@ public class BufferPool<T> : IBufferPool, IDisposable where T : unmanaged
     public MemoryBuffer1D<T, Stride1D.Dense> Get(int aidx, int size, bool zero = true) => TryGetFrom(aidx, size, zero);
     public MemoryBuffer1D<T, Stride1D.Dense> GetLike(MemoryBuffer1D<T, Stride1D.Dense> buffer, bool zero = true) => Get(buffer.AcceleratorIndex(), (int)buffer.Length, zero);
 
+    public MemoryBuffer1D<T, Stride1D.Dense>[] Get(int aidx, int size, int count, bool zero = true)
+    {
+        var result = new MemoryBuffer1D<T, Stride1D.Dense>[count];
+        for (int i = 0; i < count; i++) result[i] = Get(aidx, size, zero);
+        return result;
+    }
+    
     private static MemoryBuffer1D<T, Stride1D.Dense> Allocate(int aidx, int size) => Compute.Accelerators[aidx].Allocate1D<T>(size);
     private MemoryBuffer1D<T, Stride1D.Dense> TryGetFrom(int aidx, int size, bool zero)
     {
@@ -54,7 +61,7 @@ public class BufferPool<T> : IBufferPool, IDisposable where T : unmanaged
             buffer = stack.TryPop(out var result) ? result : Allocate(aidx, size);
         else buffer = Allocate(aidx, size);
 
-        if (zero) buffer.MemSetToZero();
+        if (zero) Compute.Call(ZeroKernel, buffer);
         return buffer;
     }
 
@@ -64,6 +71,8 @@ public class BufferPool<T> : IBufferPool, IDisposable where T : unmanaged
         foreach (var stack in kvp.Value.Values) 
             while (stack.TryPop(out var buffer)) buffer.Dispose();
     }
+
+    private readonly KernelStorage<Action<Index1D, ArrayView1D<T, Stride1D.Dense>>> ZeroKernel = new((i, r) => r[i] = default);
 }
 
 public interface IBufferPool

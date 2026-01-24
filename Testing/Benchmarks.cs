@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Raphael.Lazulite;
+using Raphael.Lazulite.LinearAlgebra;
 
 namespace Testing;
 
@@ -27,13 +28,13 @@ public static class Benchmarks
         
         Console.WriteLine($"Creating {n} matrices of size {l}x{w} ({n * l * w:E2} elements total) and storing them in memory buffers on accelerator {aidx}...");
         AcceleratedMatrix[] matrices = new AcceleratedMatrix[n];
-        var results = Compute.Get(aidx, n, l * w);
+        var results = Compute.FloatPool.Get(aidx, n, l * w);
         for (int i = 0; i < n; i++) matrices[i] = new(RandomMatrix(l, w), aidx);
         
         Console.WriteLine($"Multiplying elementwise with {n} matrices...");
         
         Stopwatch sw = Stopwatch.StartNew();
-        for (int i = 0; i < n; i++) Compute.ElementwiseMultiply(results[i], matrices[i], matrices[i]);
+        for (int i = 0; i < n; i++) LinearAlgebraSuite.ElementwiseMultiply(results[i], matrices[i], matrices[i]);
         Compute.Synchronize(aidx);
         sw.Stop();
         Console.WriteLine($"Elementwise multiplication took {sw.ElapsedMilliseconds} ms.");
@@ -76,7 +77,7 @@ public static class Benchmarks
         
         Console.WriteLine($"Creating {totalBatches} matrices of size {m}x{k} and {k}x{n} ({totalBatches * m * k + totalBatches * k * n:E2} elements total).");
         AcceleratedMatrix[,] matrices = new AcceleratedMatrix[totalBatches, 2];
-        var results = Compute.Get(aidx, totalBatches, m * n);
+        var results = Compute.FloatPool.Get(aidx, totalBatches, m * n);
         for (int i = 0; i < totalBatches; i++) matrices[i, 0] = new(RandomMatrix(m, k), aidx);
         for (int i = 0; i < totalBatches; i++) matrices[i, 1] = new(RandomMatrix(k, n), aidx);
         
@@ -84,7 +85,7 @@ public static class Benchmarks
         Console.WriteLine($"Matrix multiplying {totalBatches} batches of matrices...");
         
         Stopwatch sw = Stopwatch.StartNew();
-        for (int i = 0; i < totalBatches; i++) Compute.MatrixMultiply(matrices[i, 0], matrices[i, 1], results[i], m, k, k, n);
+        for (int i = 0; i < totalBatches; i++) LinearAlgebraSuite.MatrixMultiply(matrices[i, 0], matrices[i, 1], results[i], m, k, k, n);
         Compute.Synchronize(aidx);
         sw.Stop();
         

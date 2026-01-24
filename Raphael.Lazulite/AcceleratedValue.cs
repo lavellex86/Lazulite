@@ -3,7 +3,7 @@ using ILGPU.Runtime;
 
 namespace Raphael.Lazulite;
 
-public abstract class AcceleratedValue<TData, THost>(MemoryBuffer1D<TData, Stride1D.Dense> data)
+public abstract class AcceleratedValue<TData, THost>(MemoryBuffer1D<TData, Stride1D.Dense> data) : IDisposable
     where TData : unmanaged where THost : notnull
 {
     public MemoryBuffer1D<TData, Stride1D.Dense> Data { get; } = data;
@@ -35,4 +35,5 @@ public abstract class AcceleratedValue<TData, THost>(MemoryBuffer1D<TData, Strid
     public abstract TData[] Roll(THost value);
     
     public static implicit operator MemoryBuffer1D<TData, Stride1D.Dense>(AcceleratedValue<TData, THost> acceleratedValue) => acceleratedValue.Data;
+    public static implicit operator ArrayView1D<TData, Stride1D.Dense>(AcceleratedValue<TData, THost> acceleratedValue) => acceleratedValue.Data.View;
 }

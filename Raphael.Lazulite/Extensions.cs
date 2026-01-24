@@ -26,12 +26,6 @@ public static class ArrayViewExtensions
 
 public static class ValueExtensions
 {
-    public static BufferPool<float> FloatPool { get; } = new();
-    public static BufferPool<double> DoublePool { get; } = new();
-    public static BufferPool<int> IntPool { get; } = new();
-    public static BufferPool<long> LongPool { get; } = new();
-    public static BufferPool<byte> BytePool { get; } = new();
-
     public static AcceleratedValue<TData, THost> NonDisposable<TData, THost>(this AcceleratedValue<TData, THost> acceleratedValue) where TData : unmanaged where THost : notnull
     {
         acceleratedValue.Disposable = false;

@@ -14,22 +14,22 @@ public partial class LinearAlgebraSuite
     }
     
     public static void Dot(
-        MemoryBuffer1D<float, Stride1D.Dense> result,
-        MemoryBuffer1D<float, Stride1D.Dense> a, 
-        MemoryBuffer1D<float, Stride1D.Dense> b, 
+        ArrayView1D<float, Stride1D.Dense> result,
+        ArrayView1D<float, Stride1D.Dense> a, 
+        ArrayView1D<float, Stride1D.Dense> b, 
         bool noCuBlas = false)
     {
         var aidx = a.AcceleratorIndex();
         var blas = GetCuBlas(aidx);
         if (blas is null || noCuBlas || result.Length < 1e3)
         {
-            var temp = a.Pool().GetLike(a);
+            var temp = Compute.FloatPool.Get(a.AcceleratorIndex(), (int)a.Length);
             Compute.Call(ElementwiseMultiplyKernel, temp, a, b);
             Sum(result, temp);
             temp.Return();
         }
         else
-            blas.Dot(a.View.AsGeneral(), b.View.AsGeneral(), result.View.BaseView);
+            blas.Dot(a.AsGeneral(), b.AsGeneral(), result.BaseView);
     }
 
     public static void Axpy(

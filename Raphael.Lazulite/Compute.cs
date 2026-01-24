@@ -14,6 +14,14 @@ public static partial class Compute
     public static ConcurrentDictionary<string, int> AcceleratorIndices { get; } = [];
     public static Context Context { get; }
     
+    public static BufferPool<float> FloatPool { get; }
+    public static BufferPool<double> DoublePool { get; }
+    public static BufferPool<int> IntPool { get; }
+    public static BufferPool<uint> UnsignedIntPool { get; }
+    public static BufferPool<long> LongPool { get; }
+    public static BufferPool<ulong> UnsignedLongPool { get; }
+    public static BufferPool<byte> BytePool { get; }
+    
     internal static List<IDisposable> BufferPoolHooks { get; } = [];
 
     private static bool _disposed;
@@ -38,6 +46,14 @@ public static partial class Compute
             
             aidx++;
         }
+
+        FloatPool = new();
+        DoublePool = new();
+        IntPool = new();
+        UnsignedIntPool = new();
+        LongPool = new();
+        UnsignedLongPool = new();
+        BytePool = new();
         
         AppDomain.CurrentDomain.ProcessExit += (_, _) => Dispose();
     }
@@ -291,37 +307,44 @@ public static partial class Compute
         kernel[aidx]!(i, a, b, c, d, e, f, g, h, j, k, l, m, n, o);
     }
 
-    public static void Call(KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>>> kernel, ArrayView1D<float, Stride1D.Dense> a) 
+    public static void Call<TData>(KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>>> kernel, ArrayView1D<TData, Stride1D.Dense> a) 
+        where TData : unmanaged
         => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a);
-    public static void Call<T>(KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T>> kernel, ArrayView1D<float, Stride1D.Dense> a, T b)
+    public static void Call<TData, T>(KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T>> kernel, ArrayView1D<TData, Stride1D.Dense> a, T b)
+        where TData : unmanaged
         where T : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b);
-    public static void Call<T1, T2>(KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2>> kernel, ArrayView1D<float, Stride1D.Dense> a, T1 b, T2 c)
+    public static void Call<TData, T1, T2>(KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2>> kernel, ArrayView1D<TData, Stride1D.Dense> a, T1 b, T2 c)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b, c);
 
-    public static void Call<T1, T2, T3>(KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2, T3>> kernel, ArrayView1D<float, Stride1D.Dense> a, T1 b, T2 c,
+    public static void Call<TData, T1, T2, T3>(KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2, T3>> kernel, ArrayView1D<TData, Stride1D.Dense> a, T1 b, T2 c,
         T3 d)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct
         where T3 : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b, c, d);
 
-    public static void Call<T1, T2, T3, T4>(KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2, T3, T4>> kernel, ArrayView1D<float, Stride1D.Dense> a,
+    public static void Call<TData, T1, T2, T3, T4>(KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2, T3, T4>> kernel, ArrayView1D<TData, Stride1D.Dense> a,
         T1 b, T2 c, T3 d, T4 e)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct
         where T3 : struct
         where T4 : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b, c, d, e);
 
-    public static void Call<T1, T2, T3, T4, T5>(KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2, T3, T4, T5>> kernel,
-        ArrayView1D<float, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f)
+    public static void Call<TData, T1, T2, T3, T4, T5>(KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2, T3, T4, T5>> kernel,
+        ArrayView1D<TData, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct
         where T3 : struct
         where T4 : struct
         where T5 : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b, c, d, e, f);
 
-    public static void Call<T1, T2, T3, T4, T5, T6>(KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2, T3, T4, T5, T6>> kernel,
-        ArrayView1D<float, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g)
+    public static void Call<TData, T1, T2, T3, T4, T5, T6>(KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2, T3, T4, T5, T6>> kernel,
+        ArrayView1D<TData, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct
         where T3 : struct
@@ -329,8 +352,9 @@ public static partial class Compute
         where T5 : struct
         where T6 : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b, c, d, e, f, g);
 
-    public static void Call<T1, T2, T3, T4, T5, T6, T7>(KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7>> kernel,
-        ArrayView1D<float, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h)
+    public static void Call<TData, T1, T2, T3, T4, T5, T6, T7>(KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7>> kernel,
+        ArrayView1D<TData, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct
         where T3 : struct
@@ -339,8 +363,9 @@ public static partial class Compute
         where T6 : struct
         where T7 : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b, c, d, e, f, g, h);
 
-    public static void Call<T1, T2, T3, T4, T5, T6, T7, T8>(KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8>> kernel,
-        ArrayView1D<float, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i)
+    public static void Call<TData, T1, T2, T3, T4, T5, T6, T7, T8>(KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8>> kernel,
+        ArrayView1D<TData, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct
         where T3 : struct
@@ -350,8 +375,9 @@ public static partial class Compute
         where T7 : struct
         where T8 : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b, c, d, e, f, g, h, i);
 
-    public static void Call<T1, T2, T3, T4, T5, T6, T7, T8, T9>(KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8, T9>> kernel,
-        ArrayView1D<float, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i, T9 j)
+    public static void Call<TData, T1, T2, T3, T4, T5, T6, T7, T8, T9>(KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8, T9>> kernel,
+        ArrayView1D<TData, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i, T9 j)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct
         where T3 : struct
@@ -362,9 +388,10 @@ public static partial class Compute
         where T8 : struct
         where T9 : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b, c, d, e, f, g, h, i, j);
 
-    public static void Call<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
-        KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>> kernel,
-        ArrayView1D<float, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i, T9 j, T10 k)
+    public static void Call<TData, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
+        KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>> kernel,
+        ArrayView1D<TData, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i, T9 j, T10 k)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct
         where T3 : struct
@@ -376,9 +403,10 @@ public static partial class Compute
         where T9 : struct
         where T10 : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b, c, d, e, f, g, h, i, j, k);
 
-    public static void Call<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(
-        KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>> kernel,
-        ArrayView1D<float, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i, T9 j, T10 k, T11 l)
+    public static void Call<TData, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(
+        KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>> kernel,
+        ArrayView1D<TData, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i, T9 j, T10 k, T11 l)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct
         where T3 : struct
@@ -391,9 +419,10 @@ public static partial class Compute
         where T10 : struct
         where T11 : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b, c, d, e, f, g, h, i, j, k, l);
 
-    public static void Call<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(
-        KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>> kernel,
-        ArrayView1D<float, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i, T9 j, T10 k, T11 l, T12 m)
+    public static void Call<TData, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(
+        KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>> kernel,
+        ArrayView1D<TData, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i, T9 j, T10 k, T11 l, T12 m)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct
         where T3 : struct
@@ -407,9 +436,10 @@ public static partial class Compute
         where T11 : struct
         where T12 : struct => Call(a.AcceleratorIndex(), kernel, a.IntExtent, a, b, c, d, e, f, g, h, i, j, k, l, m);
 
-    public static void Call<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(
-        KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>> kernel,
-        ArrayView1D<float, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i, T9 j, T10 k, T11 l, T12 m, T13 n)
+    public static void Call<TData, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(
+        KernelStorage<Action<Index1D, ArrayView1D<TData, Stride1D.Dense>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>> kernel,
+        ArrayView1D<TData, Stride1D.Dense> a, T1 b, T2 c, T3 d, T4 e, T5 f, T6 g, T7 h, T8 i, T9 j, T10 k, T11 l, T12 m, T13 n)
+        where TData : unmanaged
         where T1 : struct
         where T2 : struct
         where T3 : struct

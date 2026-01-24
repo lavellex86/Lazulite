@@ -1,4 +1,6 @@
-﻿using Raphael.Lazulite;
+﻿using System.Diagnostics;
+using ILGPU.Runtime;
+using Raphael.Lazulite;
 
 namespace Testing;
 
@@ -8,16 +10,17 @@ class Program
     {
         Console.WriteLine(Compute.Accelerators[0]);
         //SimpleTests.FillTest(false);
-        SimpleTests.FillTest(true);
+        //SimpleTests.FillTest(true);
         
         //SimpleTests.SimpleMathTest(false);
+        SimpleTests.SimpleMathTest(true);
         SimpleTests.SimpleMathTest(true);
         
         SimpleTests.ScalarTest(true);
         SimpleTests.PhysicsTest(true);
         //SimpleTests.ParallelProcessingTest(true);
         //SimpleTests.ParallelProcessingTest(true, false);
-        //SimpleTests.BigMatMulTest(true);
+        SimpleTests.BigMatMulTest(true);
         SimpleTests.PoolTest(true);
         ValueTests.MathTest(true);
         ValueTests.OpsTest(true);

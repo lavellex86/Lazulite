@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using ILGPU.Runtime;
 using Raphael.Lazulite;
+using Raphael.Lazulite.LinearAlgebra;
 
 namespace Testing;
 
@@ -36,29 +37,29 @@ public static class ValueTests
     {
         int aidx = Compute.RequestAccelerator(gpu);
         
-        var a = Compute.Get(aidx, 4);
-        var b = Compute.Get(aidx, 4);
+        var a = Compute.FloatPool.Get(aidx, 4);
+        var b = Compute.FloatPool.Get(aidx, 4);
         float[] realA = [1, 2, 3, 4];
         float[] realB = [3, 4, 5, 6];
         a.CopyFromCPU(realA);
         b.CopyFromCPU(realB);
         
-        using var addBuffer = Compute.Get(aidx, 4);
-        using var subBuffer = Compute.Get(aidx, 4);
-        using var mulBuffer = Compute.Get(aidx, 4);
-        using var divBuffer = Compute.Get(aidx, 4);
-        using var maxBuffer = Compute.Get(aidx, 4);
+        using var addBuffer = Compute.FloatPool.Get(aidx, 4);
+        using var subBuffer = Compute.FloatPool.Get(aidx, 4);
+        using var mulBuffer = Compute.FloatPool.Get(aidx, 4);
+        using var divBuffer = Compute.FloatPool.Get(aidx, 4);
+        using var maxBuffer = Compute.FloatPool.Get(aidx, 4);
         
         // Compute.Call(Compute.ElementwiseAddKernels, a.View, b.View, addBuffer.View);
         // Compute.Call(Compute.ElementwiseSubtractKernels, a.View, b.View, subBuffer.View);
         // Compute.Call(Compute.ElementwiseMultiplyKernels, a.View, b.View, mulBuffer.View);
         // Compute.Call(Compute.ElementwiseDivideKernels, a.View, b, divBuffer);
         // Compute.Call(Compute.ElementwiseMaxKernels, a.View, b, maxBuffer);
-        Compute.Add(addBuffer, a, b);
-        Compute.Subtract(subBuffer, a, b);
-        Compute.ElementwiseMultiply(mulBuffer, a, b);
-        Compute.Divide(divBuffer, a, b);
-        Compute.Max(maxBuffer, a, b);
+        LinearAlgebraSuite.Add(addBuffer, a, b);
+        LinearAlgebraSuite.Subtract(subBuffer, a, b);
+        LinearAlgebraSuite.ElementwiseMultiply(mulBuffer, a, b);
+        LinearAlgebraSuite.Divide(divBuffer, a, b);
+        LinearAlgebraSuite.Max(maxBuffer, a, b);
         
         Compute.Synchronize(aidx);
         
@@ -68,22 +69,22 @@ public static class ValueTests
         Console.WriteLine($"a / b: {string.Join(',', divBuffer.GetAsArray1D())} vs {string.Join(',', realA.Select((x, i) => x / realB[i]))}");
         Console.WriteLine($"max(a, b): {string.Join(',', maxBuffer.GetAsArray1D())} vs {string.Join(',', realA.Select((x, i) => Math.Max(x, realB[i])))}");
 
-        using var expBuffer = Compute.Get(aidx, 4);
-        using var logBuffer = Compute.Get(aidx, 4);
-        using var sqrtBuffer = Compute.Get(aidx, 4);
-        using var absBuffer = Compute.Get(aidx, 4);
-        using var negateBuffer = Compute.Get(aidx, 4);
+        using var expBuffer = Compute.FloatPool.Get(aidx, 4);
+        using var logBuffer = Compute.FloatPool.Get(aidx, 4);
+        using var sqrtBuffer = Compute.FloatPool.Get(aidx, 4);
+        using var absBuffer = Compute.FloatPool.Get(aidx, 4);
+        using var negateBuffer = Compute.FloatPool.Get(aidx, 4);
         
         // Compute.Call(Compute.ElementwiseExpKernels, a.View, expBuffer.View);
         // Compute.Call(Compute.ElementwiseLogKernels, a.View, logBuffer.View);
         // Compute.Call(Compute.ElementwiseSqrtKernels, a.View, sqrtBuffer.View);
         // Compute.Call(Compute.ElementwiseAbsKernels, a.View, absBuffer.View);
         // Compute.Call(Compute.ElementwiseNegateKernels, a.View, negateBuffer.View);
-        Compute.Exp(expBuffer, a);
-        Compute.Log(logBuffer, a);
-        Compute.Sqrt(sqrtBuffer, a);
-        Compute.Abs(absBuffer, a);
-        Compute.Negate(negateBuffer, a);
+        LinearAlgebraSuite.Exp(expBuffer, a);
+        LinearAlgebraSuite.Log(logBuffer, a);
+        LinearAlgebraSuite.Sqrt(sqrtBuffer, a);
+        LinearAlgebraSuite.Abs(absBuffer, a);
+        LinearAlgebraSuite.Negate(negateBuffer, a);
         
         Compute.Synchronize(aidx);
         Console.WriteLine($"exp(a): {string.Join(',', expBuffer.GetAsArray1D())} vs {string.Join(',', realA.Select(x => (float)Math.Exp(x)))}");
@@ -93,7 +94,7 @@ public static class ValueTests
         Console.WriteLine($"-a: {string.Join(',', negateBuffer.GetAsArray1D())} vs {string.Join(',', realA.Select(x => -x))}");
         
         var dot = realA.Select((x, i) => x * realB[i]).Sum();
-        using var dotBuffer = Compute.Dot(a, b);
+        using var dotBuffer = LinearAlgebraSuite.Dot(a, b);
         Compute.Synchronize(aidx);
         Console.WriteLine($"dot(a, b): {dot} vs {dotBuffer.GetAsArray1D()[0]}");
     }
@@ -121,7 +122,7 @@ public static class ValueTests
         e.Dispose();
         Compute.Synchronize(aidx);
 
-        var f = Compute.Get(aidx, 1);
+        var f = Compute.FloatPool.Get(aidx, 1);
         Console.WriteLine(f.GetAsArray1D()[0]);
         Console.WriteLine(f.GetHashCode());
     }

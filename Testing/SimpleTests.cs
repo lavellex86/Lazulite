@@ -3,6 +3,7 @@ using System.Diagnostics;
 using ILGPU;
 using ILGPU.Runtime;
 using Raphael.Lazulite;
+using Raphael.Lazulite.LinearAlgebra;
 
 namespace Testing;
 
@@ -22,9 +23,9 @@ public static class SimpleTests
         sw.Start();
         for (int i = 0; i < n; i++)
         {
-            var buffer = Compute.Get(aidx, size);
-            Compute.Fill(buffer, 1);
-            Compute.Return(buffer);
+            var buffer = Compute.FloatPool.Get(aidx, size);
+            LinearAlgebraSuite.Fill(buffer, 1);
+            Compute.FloatPool.Return(buffer);
         }
         sw.Stop();
         Compute.Synchronize(aidx);
@@ -33,9 +34,9 @@ public static class SimpleTests
         sw.Restart();
         for (int i = 0; i < n; i++)
         {
-            var buffer = Compute.Get(aidx, size);
-            Compute.Fill(buffer, 1);
-            Compute.Return(buffer);
+            var buffer = Compute.FloatPool.Get(aidx, size);
+            LinearAlgebraSuite.Fill(buffer, 1);
+            Compute.FloatPool.Return(buffer);
         }
         sw.Stop();
         Console.WriteLine($"Filled {n} vectors of size {size} in {sw.ElapsedMilliseconds} (pre-allocations - {n * size} elements) where allocations are done in-loop.");
@@ -66,7 +67,7 @@ public static class SimpleTests
 
         sw.Start();
         for (int i = 0; i < n; i++) 
-            Compute.ElementwiseMultiply(results[i], buffers[i], buffers[i]);
+            LinearAlgebraSuite.ElementwiseMultiply(results[i], buffers[i], buffers[i]);
         Compute.Synchronize(aidx);
         sw.Stop();
         
@@ -127,10 +128,10 @@ public static class SimpleTests
             (forces[i * 3], forces[i * 3 + 1], forces[i * 3 + 2]) = (0, 0, 0);
         }
 
-        MemoryBuffer1D<float, Stride1D.Dense> positionsBuffer = Compute.Get(aidx, n * 3);
-        MemoryBuffer1D<float, Stride1D.Dense> velocitiesBuffer = Compute.Get(aidx, n * 3);
-        MemoryBuffer1D<float, Stride1D.Dense> massesBuffer = Compute.Get(aidx, n);
-        MemoryBuffer1D<float, Stride1D.Dense> forcesBuffer = Compute.Get(aidx, n * 3);
+        MemoryBuffer1D<float, Stride1D.Dense> positionsBuffer = Compute.FloatPool.Get(aidx, n * 3);
+        MemoryBuffer1D<float, Stride1D.Dense> velocitiesBuffer = Compute.FloatPool.Get(aidx, n * 3);
+        MemoryBuffer1D<float, Stride1D.Dense> massesBuffer = Compute.FloatPool.Get(aidx, n);
+        MemoryBuffer1D<float, Stride1D.Dense> forcesBuffer = Compute.FloatPool.Get(aidx, n * 3);
         positionsBuffer.CopyFromCPU(positions);
         velocitiesBuffer.CopyFromCPU(velocities);
         massesBuffer.CopyFromCPU(masses);
@@ -189,7 +190,7 @@ public static class SimpleTests
         Compute.Synchronize(aidx);
         sw.Stop();
         
-        Compute.Return(positionsBuffer, velocitiesBuffer, massesBuffer, forcesBuffer);
+        Compute.FloatPool.Return(positionsBuffer, velocitiesBuffer, massesBuffer, forcesBuffer);
         
         Console.WriteLine($"Total timesteps: {finalT / dt}");
         Console.WriteLine($"Total bodies: {n}");
@@ -224,22 +225,22 @@ public static class SimpleTests
         sw.Start();
         foreach (var (a, b) in workQueue)
         {
-            var aBuffer = Compute.Get(aidx, mk);
-            var bBuffer = Compute.Get(aidx, kn);
-            var resultBuffer = Compute.Get(aidx, mn);
+            var aBuffer = Compute.FloatPool.Get(aidx, mk);
+            var bBuffer = Compute.FloatPool.Get(aidx, kn);
+            var resultBuffer = Compute.FloatPool.Get(aidx, mn);
             aBuffer.CopyFromCPU(a);
             bBuffer.CopyFromCPU(b);
-            Compute.MatrixMultiply(aBuffer, bBuffer, resultBuffer, m, k, k, n, noCuBlas: !cublas);
+            LinearAlgebraSuite.MatrixMultiply(aBuffer, bBuffer, resultBuffer, m, k, k, n, noCuBlas: !cublas);
             results.Add(resultBuffer);
-            Compute.Return(aBuffer, bBuffer);
+            Compute.FloatPool.Return(aBuffer, bBuffer);
         }
         Compute.Synchronize(aidx);
         sw.Stop();
         
         Console.WriteLine($"Processed {totalBatches} batches of {m}x{k}x{n} matrix multiplies in: {sw.ElapsedMilliseconds} ms.");
         
-        Compute.Return(results.ToArray());
-        Compute.Clear(aidx);
+        Compute.FloatPool.Return(results.ToArray());
+        Compute.FloatPool.ClearAt(aidx);
         results.Clear();
         
         var gpuIndices = Compute.Accelerators.Values
@@ -260,16 +261,16 @@ public static class SimpleTests
             {
                 while (workQueue.TryDequeue(out var tuple))
                 {
-                    var aBuffer = Compute.Get(aidx_, mk);
-                    var bBuffer = Compute.Get(aidx_, kn);
-                    var resultBuffer = Compute.Get(aidx_, mn);
+                    var aBuffer = Compute.FloatPool.Get(aidx_, mk);
+                    var bBuffer = Compute.FloatPool.Get(aidx_, kn);
+                    var resultBuffer = Compute.FloatPool.Get(aidx_, mn);
         
                     aBuffer.CopyFromCPU(tuple.a);
                     bBuffer.CopyFromCPU(tuple.b);
-                    Compute.MatrixMultiply(aBuffer, bBuffer, resultBuffer, m, k, k, n, noCuBlas:!cublas);
+                    LinearAlgebraSuite.MatrixMultiply(aBuffer, bBuffer, resultBuffer, m, k, k, n, noCuBlas:!cublas);
         
                     results.Add(resultBuffer);
-                    Compute.Return(aBuffer, bBuffer);
+                    Compute.FloatPool.Return(aBuffer, bBuffer);
                 }
                 Compute.Synchronize(aidx_);
                 Console.WriteLine($"{aidx_} finished processing!");
@@ -278,7 +279,7 @@ public static class SimpleTests
         Task.WaitAll(tasks);
         sw.Stop();
         
-        Compute.Return(results.ToArray());
+        Compute.FloatPool.Return(results.ToArray());
         results.Clear();
         Console.WriteLine($"Processed {totalBatches} batches of {m}x{k}x{n} matrix multiplies in: {sw.ElapsedMilliseconds} ms.");
     }
@@ -299,21 +300,21 @@ public static class SimpleTests
         
         float[,] a = RandomMatrix(m, k);
         float[,] b = RandomMatrix(k, n);
-        MemoryBuffer1D<float, Stride1D.Dense> aBuffer = Compute.Get(aidx, mk);
-        MemoryBuffer1D<float, Stride1D.Dense> bBuffer = Compute.Get(aidx, kn);
-        MemoryBuffer1D<float, Stride1D.Dense> resultBuffer = Compute.Get(aidx, mn);
+        MemoryBuffer1D<float, Stride1D.Dense> aBuffer = Compute.FloatPool.Get(aidx, mk);
+        MemoryBuffer1D<float, Stride1D.Dense> bBuffer = Compute.FloatPool.Get(aidx, kn);
+        MemoryBuffer1D<float, Stride1D.Dense> resultBuffer = Compute.FloatPool.Get(aidx, mn);
         aBuffer.CopyFromCPU(MatrixProxy.Roll(a));
         bBuffer.CopyFromCPU(MatrixProxy.Roll(b));
         
         Console.WriteLine("Starting processing...");
         sw.Start();
-        Compute.MatrixMultiply(aBuffer, bBuffer, resultBuffer, m, k, k, n, noCuBlas: false);
+        LinearAlgebraSuite.MatrixMultiply(aBuffer, bBuffer, resultBuffer, m, k, k, n, noCuBlas: false);
         Console.WriteLine("Finished processing!");
         Compute.Synchronize(aidx);
         sw.Stop();
         
         Console.WriteLine($"{m}x{k}x{n} matrix multiply finished in: {sw.ElapsedMilliseconds} ms.");
-        Compute.Return(resultBuffer, aBuffer, bBuffer);
+        Compute.FloatPool.Return(resultBuffer, aBuffer, bBuffer);
     }
 
     public static void PoolTest(bool gpu)
@@ -326,22 +327,22 @@ public static class SimpleTests
         KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>,
             ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>>> kernels = new((i, r, a, b) => 
             r[i] += (a[i] * a[i] - b[i] * b[i]) / (a[i] * a[i] + b[i] * b[i]));
-        var result = Compute.Get(aidx, size);
+        var result = Compute.FloatPool.Get(aidx, size);
         
         sw.Start();
         for (int i = 0; i < n; i++)
         {
-            var bufferA = Compute.Get(aidx, size).Set(RandomVector(size));
-            var bufferB = Compute.Get(aidx, size).Set(RandomVector(size));
+            var bufferA = Compute.FloatPool.Get(aidx, size).Set(RandomVector(size));
+            var bufferB = Compute.FloatPool.Get(aidx, size).Set(RandomVector(size));
 
             Compute.Call(kernels, result, bufferA, bufferB);
-            Compute.Return(bufferA, bufferB);
+            Compute.FloatPool.Return(bufferA, bufferB);
         }
         Compute.Synchronize(aidx);
         sw.Stop();
         
         Console.WriteLine($"Processed {n} batches in {sw.ElapsedMilliseconds} ms.");
-        Compute.Return(result);
+        Compute.FloatPool.Return(result);
     }
     
     public static float[,] RandomMatrix(int rows, int cols)

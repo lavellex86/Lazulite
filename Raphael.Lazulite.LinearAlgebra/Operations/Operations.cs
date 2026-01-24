@@ -35,117 +35,135 @@ public partial class LinearAlgebraSuite
         return blas;
     }
     
-    public static void Add(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> a, MemoryBuffer1D<float, Stride1D.Dense> b) =>
+    public static void Fill(ArrayView1D<float, Stride1D.Dense> r, float val) => Compute.Call(FillKernel, r, val);
+    public static void Concat(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) => 
+        Compute.Call(ConcatKernel, r, a, b);
+    public static MemoryBuffer1D<float, Stride1D.Dense> Concat(ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) 
+    {
+        var result = Compute.FloatPool.Get(a.AcceleratorIndex(), (int)(a.Length + b.Length));
+        Compute.Call(ConcatKernel, result, a, b);
+        return result;
+    }
+    public static void Slice(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> val, int start, int end) => 
+        Compute.Call(SliceKernel, r, val, start, end); 
+    public static MemoryBuffer1D<float, Stride1D.Dense> Slice(ArrayView1D<float, Stride1D.Dense> val, int start, int end)
+    {
+        var result = Compute.FloatPool.Get(val.AcceleratorIndex(), end - start);
+        Compute.Call(SliceKernel, result, val, start, end);
+        return result;
+    }
+    
+    public static void Add(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) =>
         Compute.Call(AddKernel, r, a, b);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Add(MemoryBuffer1D<float, Stride1D.Dense> a, MemoryBuffer1D<float, Stride1D.Dense> b) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> Add(ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) => 
         a.Encase(r => Add(r, a, b));
 
-    public static void Subtract(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> a, MemoryBuffer1D<float, Stride1D.Dense> b) =>
+    public static void Subtract(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) =>
         Compute.Call(SubtractKernel, r, a, b);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Subtract(MemoryBuffer1D<float, Stride1D.Dense> a, MemoryBuffer1D<float, Stride1D.Dense> b) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> Subtract(ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) => 
         a.Encase(r => Subtract(r, a, b));
 
-    public static void ElementwiseMultiply(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> a, MemoryBuffer1D<float, Stride1D.Dense> b) =>
+    public static void ElementwiseMultiply(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) =>
         Compute.Call(ElementwiseMultiplyKernel, r, a, b);
-    public static MemoryBuffer1D<float, Stride1D.Dense> ElementwiseMultiply(MemoryBuffer1D<float, Stride1D.Dense> a, MemoryBuffer1D<float, Stride1D.Dense> b) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> ElementwiseMultiply(ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) => 
         a.Encase(r => ElementwiseMultiply(r, a, b));
 
-    public static void Divide(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> a, MemoryBuffer1D<float, Stride1D.Dense> b) =>
+    public static void Divide(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) =>
         Compute.Call(DivideKernel, r, a, b);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Divide(MemoryBuffer1D<float, Stride1D.Dense> a, MemoryBuffer1D<float, Stride1D.Dense> b) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> Divide(ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) => 
         a.Encase(r => Divide(r, a, b));
 
-    public static void Max(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> a, MemoryBuffer1D<float, Stride1D.Dense> b) =>
+    public static void Max(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) =>
         Compute.Call(MaxKernel, r, a, b);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Max(MemoryBuffer1D<float, Stride1D.Dense> a, MemoryBuffer1D<float, Stride1D.Dense> b) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> Max(ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b) => 
         a.Encase(r => Max(r, a, b));
 
-    public static void Exp(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> val) =>
+    public static void Exp(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> val) =>
         Compute.Call(ExpKernel, r, val);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Exp(MemoryBuffer1D<float, Stride1D.Dense> val) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> Exp(ArrayView1D<float, Stride1D.Dense> val) => 
         val.Encase(r => Exp(r, val));
 
-    public static void Log(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> val) =>
+    public static void Log(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> val) =>
         Compute.Call(LogKernel, r, val);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Log(MemoryBuffer1D<float, Stride1D.Dense> val) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> Log(ArrayView1D<float, Stride1D.Dense> val) => 
         val.Encase(r => Log(r, val));
 
-    public static void Sqrt(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> val) =>
+    public static void Sqrt(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> val) =>
         Compute.Call(SqrtKernel, r, val);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Sqrt(MemoryBuffer1D<float, Stride1D.Dense> val) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> Sqrt(ArrayView1D<float, Stride1D.Dense> val) => 
         val.Encase(r => Sqrt(r, val));
 
-    public static void Abs(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> val) =>
+    public static void Abs(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> val) =>
         Compute.Call(AbsKernel, r, val);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Abs(MemoryBuffer1D<float, Stride1D.Dense> val) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> Abs(ArrayView1D<float, Stride1D.Dense> val) => 
         val.Encase(r => Abs(r, val));
 
-    public static void Negate(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> val) =>
+    public static void Negate(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> val) =>
         Compute.Call(NegateKernel, r, val);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Negate(MemoryBuffer1D<float, Stride1D.Dense> val) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> Negate(ArrayView1D<float, Stride1D.Dense> val) => 
         val.Encase(r => Negate(r, val));
     
-    public static void Sine(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> val) =>
+    public static void Sine(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> val) =>
         Compute.Call(SineKernel, r, val);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Sine(MemoryBuffer1D<float, Stride1D.Dense> val) =>
+    public static MemoryBuffer1D<float, Stride1D.Dense> Sine(ArrayView1D<float, Stride1D.Dense> val) =>
         val.Encase(r => Sine(r, val));
     
-    public static void Cosine(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> val) =>
+    public static void Cosine(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> val) =>
         Compute.Call(CosineKernel, r, val);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Cosine(MemoryBuffer1D<float, Stride1D.Dense> val) =>
+    public static MemoryBuffer1D<float, Stride1D.Dense> Cosine(ArrayView1D<float, Stride1D.Dense> val) =>
         val.Encase(r => Cosine(r, val));
     
-    public static void Tangent(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> val) =>
+    public static void Tangent(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> val) =>
         Compute.Call(TangentKernel, r, val);
-    public static MemoryBuffer1D<float, Stride1D.Dense> Tangent(MemoryBuffer1D<float, Stride1D.Dense> val) =>
+    public static MemoryBuffer1D<float, Stride1D.Dense> Tangent(ArrayView1D<float, Stride1D.Dense> val) =>
         val.Encase(r => Tangent(r, val));
 
-    public static void ScalarPower(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, MemoryBuffer1D<float, Stride1D.Dense> scalar) =>
+    public static void ScalarPower(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> value, ArrayView1D<float, Stride1D.Dense> scalar) =>
         Compute.Call(ScalarPowerKernel, r, value, scalar);
 
-    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarPower(MemoryBuffer1D<float, Stride1D.Dense> value, MemoryBuffer1D<float, Stride1D.Dense> scalar) =>
+    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarPower(ArrayView1D<float, Stride1D.Dense> value, ArrayView1D<float, Stride1D.Dense> scalar) =>
         value.Encase(r => ScalarPower(r, value, scalar));
 
-    public static void ScalarMultiply(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, MemoryBuffer1D<float, Stride1D.Dense> scalar) =>
+    public static void ScalarMultiply(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> value, ArrayView1D<float, Stride1D.Dense> scalar) =>
         Compute.Call(ScalarMultiplyKernel, r, value, scalar);
-    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarMultiply(MemoryBuffer1D<float, Stride1D.Dense> value, MemoryBuffer1D<float, Stride1D.Dense> scalar) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarMultiply(ArrayView1D<float, Stride1D.Dense> value, ArrayView1D<float, Stride1D.Dense> scalar) => 
         value.Encase(r => ScalarMultiply(r, value, scalar));
 
-    public static void ScalarDivide(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, MemoryBuffer1D<float, Stride1D.Dense> scalar) =>
+    public static void ScalarDivide(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> value, ArrayView1D<float, Stride1D.Dense> scalar) =>
         Compute.Call(ScalarDivideKernel, r, value, scalar);
-    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarDivide(MemoryBuffer1D<float, Stride1D.Dense> value, MemoryBuffer1D<float, Stride1D.Dense> scalar) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarDivide(ArrayView1D<float, Stride1D.Dense> value, ArrayView1D<float, Stride1D.Dense> scalar) => 
         value.Encase(r => ScalarDivide(r, value, scalar));
 
-    public static void ScalarMax(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, MemoryBuffer1D<float, Stride1D.Dense> scalar) =>
+    public static void ScalarMax(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> value, ArrayView1D<float, Stride1D.Dense> scalar) =>
         Compute.Call(ScalarMaxKernel, r, value, scalar);
-    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarMax(MemoryBuffer1D<float, Stride1D.Dense> value, MemoryBuffer1D<float, Stride1D.Dense> scalar) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarMax(ArrayView1D<float, Stride1D.Dense> value, ArrayView1D<float, Stride1D.Dense> scalar) => 
         value.Encase(r => ScalarMax(r, value, scalar));
     
-    public static void FloatPower(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, float scalar) =>
+    public static void FloatPower(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> value, float scalar) =>
         Compute.Call(FloatPowerKernel, r, value, scalar);
-    public static MemoryBuffer1D<float, Stride1D.Dense> FloatPower(MemoryBuffer1D<float, Stride1D.Dense> value, float scalar) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> FloatPower(ArrayView1D<float, Stride1D.Dense> value, float scalar) => 
         value.Encase(r => FloatPower(r, value, scalar));
 
-    public static void FloatMultiply(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, float scalar) =>
+    public static void FloatMultiply(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> value, float scalar) =>
         Compute.Call(FloatMultiplyKernel, r, value, scalar);
-    public static MemoryBuffer1D<float, Stride1D.Dense> FloatMultiply(MemoryBuffer1D<float, Stride1D.Dense> value, float scalar) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> FloatMultiply(ArrayView1D<float, Stride1D.Dense> value, float scalar) => 
         value.Encase(r => FloatMultiply(r, value, scalar));
 
-    public static void FloatMax(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, float scalar) =>
+    public static void FloatMax(ArrayView1D<float, Stride1D.Dense> r, ArrayView1D<float, Stride1D.Dense> value, float scalar) =>
         Compute.Call(FloatMaxKernel, r, value, scalar);
-    public static MemoryBuffer1D<float, Stride1D.Dense> FloatMax(MemoryBuffer1D<float, Stride1D.Dense> value, float scalar) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> FloatMax(ArrayView1D<float, Stride1D.Dense> value, float scalar) => 
         value.Encase(r => FloatMax(r, value, scalar));
 
-    public static MemoryBuffer1D<float, Stride1D.Dense> Sum(MemoryBuffer1D<float, Stride1D.Dense> val)
+    public static MemoryBuffer1D<float, Stride1D.Dense> Sum(ArrayView1D<float, Stride1D.Dense> val)
     {
-        var result = val.Pool().Get(val.AcceleratorIndex(), 1);
+        var result = Compute.FloatPool.Get(val.AcceleratorIndex(), 1);
         Sum(result, val);
         return result;
     }
 
-    public static MemoryBuffer1D<float, Stride1D.Dense> Dot(MemoryBuffer1D<float, Stride1D.Dense> a, MemoryBuffer1D<float, Stride1D.Dense> b)
+    public static MemoryBuffer1D<float, Stride1D.Dense> Dot(ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b)
     {
-        var result = a.Pool().Get(a.AcceleratorIndex(), 1);
+        var result = Compute.FloatPool.Get(a.AcceleratorIndex(), 1);
         Dot(result, a, b);
         return result;
     }

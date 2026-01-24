@@ -11,16 +11,29 @@ public static class AcceleratedTensorExtensions
         action(result);
         return result;
     }
+    
+    public static AcceleratedScalar AsScalar(this AcceleratedTensor<float> tensor) => new(tensor);
+    public static AcceleratedVector AsVector(this AcceleratedTensor<float[]> tensor) => new(tensor);
+    public static AcceleratedMatrix AsMatrix(this AcceleratedTensor<float[,]> tensor) => new(tensor, tensor.Shape);
 }
 
 public static class MemoryBufferExtensions
 {
-    public static BufferPool<float> Pool(this MemoryBuffer1D<float, Stride1D.Dense> buffer) => ValueExtensions.FloatPool;
-    public static void Return(this MemoryBuffer1D<float, Stride1D.Dense> buffer) => buffer.Pool().Return(buffer);
+    public static void Return(this MemoryBuffer1D<float, Stride1D.Dense> buffer) => Compute.FloatPool.Return(buffer);
 
     public static MemoryBuffer1D<float, Stride1D.Dense> Encase(this MemoryBuffer1D<float, Stride1D.Dense> alike, Action<MemoryBuffer1D<float, Stride1D.Dense>> action)
     {
-        var result = ValueExtensions.FloatPool.GetLike(alike);
+        var result = Compute.FloatPool.GetLike(alike);
+        action(result);
+        return result;
+    }
+}
+
+public static class ArrayViewExtensions
+{
+    public static MemoryBuffer1D<float, Stride1D.Dense> Encase(this ArrayView1D<float, Stride1D.Dense> alike, Action<ArrayView1D<float, Stride1D.Dense>> action)
+    {
+        var result = Compute.FloatPool.Get(alike.AcceleratorIndex(), (int)alike.Length);
         action(result);
         return result;
     }
