@@ -59,8 +59,8 @@ public static class SimpleTests
             matrices[i] = matrix;
         }
 
-        MatrixValue[] buffers = new MatrixValue[n];
-        MatrixValue[] results = new MatrixValue[n];
+        AcceleratedMatrix[] buffers = new AcceleratedMatrix[n];
+        AcceleratedMatrix[] results = new AcceleratedMatrix[n];
         for (int i = 0; i < n; i++) buffers[i] = new(matrices[i], aidx);
         for (int i = 0; i < n; i++) results[i] = new(new float[size, size], aidx);
 
@@ -78,9 +78,9 @@ public static class SimpleTests
         aidx = Compute.RequestAccelerator(gpu);
         Console.WriteLine(Compute.IsGpuAccelerator(aidx) ? "GPU accelerator" : "CPU accelerator");
         
-        ScalarValue a = new(1, aidx);
-        ScalarValue b = new(2, aidx);
-        ScalarValue c = new(3, aidx);
+        AcceleratedScalar a = new(1, aidx);
+        AcceleratedScalar b = new(2, aidx);
+        AcceleratedScalar c = new(3, aidx);
         
         var d = a + b;
         var e = d * c;

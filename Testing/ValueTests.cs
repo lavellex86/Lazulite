@@ -14,8 +14,8 @@ public static class ValueTests
         Console.WriteLine(Compute.IsGpuAccelerator(_aidx) ? $"GPU accelerator {_aidx}" : $"CPU accelerator {_aidx}");
         Stopwatch sw = new();
 
-        using MatrixValue a = new(SimpleTests.RandomMatrix(10000, 10000), _aidx);
-        using MatrixValue b = new(SimpleTests.RandomMatrix(10000, 10000), _aidx);
+        using AcceleratedMatrix a = new(SimpleTests.RandomMatrix(10000, 10000), _aidx);
+        using AcceleratedMatrix b = new(SimpleTests.RandomMatrix(10000, 10000), _aidx);
         using var c = a + b;
         
         sw.Start();
@@ -102,8 +102,8 @@ public static class ValueTests
     {
         int aidx = Compute.RequestAccelerator(gpu);
         
-        var a = new ScalarValue(1, aidx);
-        var b = new ScalarValue(2, aidx);
+        var a = new AcceleratedScalar(1, aidx);
+        var b = new AcceleratedScalar(2, aidx);
         var c = a + b;
         Console.WriteLine(a.Data.GetHashCode());
         Console.WriteLine(b.Data.GetHashCode());
@@ -113,7 +113,7 @@ public static class ValueTests
         c.Dispose();
         Compute.Synchronize(aidx);
 
-        var d = new ScalarValue(3, aidx);
+        var d = new AcceleratedScalar(3, aidx);
         var e = d * c;
         Console.WriteLine(d.Data.GetHashCode());
         Console.WriteLine(e.Data.GetHashCode());

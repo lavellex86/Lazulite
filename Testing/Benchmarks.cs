@@ -26,7 +26,7 @@ public static class Benchmarks
         Console.WriteLine($"Square Benchmark starting using accelerator {aidx} ({Compute.Accelerators[aidx].Name} - {acceleratorType} accelerator).");
         
         Console.WriteLine($"Creating {n} matrices of size {l}x{w} ({n * l * w:E2} elements total) and storing them in memory buffers on accelerator {aidx}...");
-        MatrixValue[] matrices = new MatrixValue[n];
+        AcceleratedMatrix[] matrices = new AcceleratedMatrix[n];
         var results = Compute.Get(aidx, n, l * w);
         for (int i = 0; i < n; i++) matrices[i] = new(RandomMatrix(l, w), aidx);
         
@@ -50,8 +50,8 @@ public static class Benchmarks
         Console.WriteLine($"Square Benchmark (with matrix values) starting using accelerator {aidx} ({Compute.Accelerators[aidx].Name} - {acceleratorType} accelerator).");
         
         Console.WriteLine($"Creating {n} matrices of size {l}x{w} ({n * l * w:E2} elements total).");
-        MatrixValue[] matrices = new MatrixValue[n];
-        MatrixValue[] results = new MatrixValue[n];
+        AcceleratedMatrix[] matrices = new AcceleratedMatrix[n];
+        AcceleratedMatrix[] results = new AcceleratedMatrix[n];
         for (int i = 0; i < n; i++) matrices[i] = new(RandomMatrix(l, w), aidx);
         
         Console.WriteLine($"Multiplying elementwise with {n} matrices...");
@@ -75,7 +75,7 @@ public static class Benchmarks
         Console.WriteLine(m * n > 1e3 ? "This benchmark will use CuBLAS! (m * n > 1e3)" : "This benchmark will use a naive implementation... (m * n < 1e3)");
         
         Console.WriteLine($"Creating {totalBatches} matrices of size {m}x{k} and {k}x{n} ({totalBatches * m * k + totalBatches * k * n:E2} elements total).");
-        MatrixValue[,] matrices = new MatrixValue[totalBatches, 2];
+        AcceleratedMatrix[,] matrices = new AcceleratedMatrix[totalBatches, 2];
         var results = Compute.Get(aidx, totalBatches, m * n);
         for (int i = 0; i < totalBatches; i++) matrices[i, 0] = new(RandomMatrix(m, k), aidx);
         for (int i = 0; i < totalBatches; i++) matrices[i, 1] = new(RandomMatrix(k, n), aidx);

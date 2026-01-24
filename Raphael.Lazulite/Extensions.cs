@@ -32,21 +32,21 @@ public static class ValueExtensions
     public static BufferPool<long> LongPool { get; } = new();
     public static BufferPool<byte> BytePool { get; } = new();
 
-    public static Value<TData, THost> NonDisposable<TData, THost>(this Value<TData, THost> value) where TData : unmanaged where THost : notnull
+    public static AcceleratedValue<TData, THost> NonDisposable<TData, THost>(this AcceleratedValue<TData, THost> acceleratedValue) where TData : unmanaged where THost : notnull
     {
-        value.Disposable = false;
-        return value;
+        acceleratedValue.Disposable = false;
+        return acceleratedValue;
     }
 
-    public static Value<TData, THost> Disposable<TData, THost>(this Value<TData, THost> value) where TData : unmanaged where THost : notnull
+    public static AcceleratedValue<TData, THost> Disposable<TData, THost>(this AcceleratedValue<TData, THost> acceleratedValue) where TData : unmanaged where THost : notnull
     {
-        value.Disposable = true;
-        return value;
+        acceleratedValue.Disposable = true;
+        return acceleratedValue;
     }
     
-    public static Value<TData, THost> Set<TData, THost>(this Value<TData, THost> value, Value<TData, THost> data) where TData : unmanaged where THost : notnull
+    public static AcceleratedValue<TData, THost> Set<TData, THost>(this AcceleratedValue<TData, THost> acceleratedValue, AcceleratedValue<TData, THost> data) where TData : unmanaged where THost : notnull
     {
-        value.UpdateWith(data);
-        return value;
+        acceleratedValue.UpdateWith(data);
+        return acceleratedValue;
     }
 }

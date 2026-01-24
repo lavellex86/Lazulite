@@ -3,7 +3,7 @@ using ILGPU.Runtime;
 
 namespace Raphael.Lazulite;
 
-public abstract class Value<TData, THost>(MemoryBuffer1D<TData, Stride1D.Dense> data)
+public abstract class AcceleratedValue<TData, THost>(MemoryBuffer1D<TData, Stride1D.Dense> data)
     where TData : unmanaged where THost : notnull
 {
     public MemoryBuffer1D<TData, Stride1D.Dense> Data { get; } = data;
@@ -20,7 +20,7 @@ public abstract class Value<TData, THost>(MemoryBuffer1D<TData, Stride1D.Dense> 
         return Unroll(Data.View.GetAsArray1D());
     }
     public void FromHost(THost value) => Data.CopyFromCPU(Roll(value));
-    public void UpdateWith(Value<TData, THost> other) => Data.CopyFrom(other.Data);
+    public void UpdateWith(AcceleratedValue<TData, THost> other) => Data.CopyFrom(other.Data);
 
     public void Dispose()
     {
@@ -34,5 +34,5 @@ public abstract class Value<TData, THost>(MemoryBuffer1D<TData, Stride1D.Dense> 
     public abstract THost Unroll(TData[] rolled);
     public abstract TData[] Roll(THost value);
     
-    public static implicit operator MemoryBuffer1D<TData, Stride1D.Dense>(Value<TData, THost> value) => value.Data;
+    public static implicit operator MemoryBuffer1D<TData, Stride1D.Dense>(AcceleratedValue<TData, THost> acceleratedValue) => acceleratedValue.Data;
 }

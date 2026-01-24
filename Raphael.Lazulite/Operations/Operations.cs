@@ -103,24 +103,24 @@ public partial class Compute
     public static MemoryBuffer1D<float, Stride1D.Dense> Tangent(MemoryBuffer1D<float, Stride1D.Dense> val) =>
         Encase(val, r => Tangent(r, val));
 
-    public static void ScalarPower(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, Value<,> scalar) =>
+    public static void ScalarPower(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, AcceleratedValue<,> scalar) =>
         Call(ScalarPowerKernel, r, value, scalar);
-    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarPower(MemoryBuffer1D<float, Stride1D.Dense> value, Value<,> scalar) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarPower(MemoryBuffer1D<float, Stride1D.Dense> value, AcceleratedValue<,> scalar) => 
         Encase(value, r => ScalarPower(r, value, scalar));
 
-    public static void ScalarMultiply(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, Value<,> scalar) =>
+    public static void ScalarMultiply(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, AcceleratedValue<,> scalar) =>
         Call(ScalarMultiplyKernel, r, value, scalar);
-    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarMultiply(MemoryBuffer1D<float, Stride1D.Dense> value, Value<,> scalar) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarMultiply(MemoryBuffer1D<float, Stride1D.Dense> value, AcceleratedValue<,> scalar) => 
         Encase(value, r => ScalarMultiply(r, value, scalar));
 
-    public static void ScalarDivide(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, Value<,> scalar) =>
+    public static void ScalarDivide(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, AcceleratedValue<,> scalar) =>
         Call(ScalarDivideKernel, r, value, scalar);
-    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarDivide(MemoryBuffer1D<float, Stride1D.Dense> value, Value<,> scalar) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarDivide(MemoryBuffer1D<float, Stride1D.Dense> value, AcceleratedValue<,> scalar) => 
         Encase(value, r => ScalarDivide(r, value, scalar));
 
-    public static void ScalarMax(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, Value<,> scalar) =>
+    public static void ScalarMax(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, AcceleratedValue<,> scalar) =>
         Call(ScalarMaxKernel, r, value, scalar);
-    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarMax(MemoryBuffer1D<float, Stride1D.Dense> value, Value<,> scalar) => 
+    public static MemoryBuffer1D<float, Stride1D.Dense> ScalarMax(MemoryBuffer1D<float, Stride1D.Dense> value, AcceleratedValue<,> scalar) => 
         Encase(value, r => ScalarMax(r, value, scalar));
     
     public static void FloatPower(MemoryBuffer1D<float, Stride1D.Dense> r, MemoryBuffer1D<float, Stride1D.Dense> value, float scalar) =>
