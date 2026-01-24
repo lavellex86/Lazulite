@@ -1,11 +1,11 @@
 ﻿using ILGPU;
 using ILGPU.Runtime;
 
-namespace Raphael.Lazulite.Kernels;
+namespace Raphael.Lazulite.Suite;
 
-public static class MatrixKernels
+public static partial class LinearAlgebra
 {
-    public static void MatrixMultiplyKernel(
+    public static void MatrixMultiplyKernelImpl(
         Index1D index,
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a,
@@ -33,17 +33,16 @@ public static class MatrixKernels
         result[resultIdx] = alpha * sum + beta * result[resultIdx];
     }
 
-    public static void MatrixVectorMultiplyKernel(
+    public static void MatrixVectorMultiplyKernelImpl(
         Index1D index,
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> matrix,
         ArrayView1D<float, Stride1D.Dense> vector,
         int m, int n,
-        float alpha, float beta, int transposeMatrix) // matrix is m x n, vector is n (or m if transposed), result is m (or n if transposed)
+        float alpha, float beta, int transposeMatrix)
     {
         if (transposeMatrix == 1)
         {
-            // matrix^T is n x m, vector is m, result is n
             int col = index.X;
             if (col >= n) return;
 
@@ -62,11 +61,11 @@ public static class MatrixKernels
         }
     }
 
-    public static void TransposeKernel(
+    public static void TransposeKernelImpl(
         Index1D index,
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> matrix,
-        int m, int n) // matrix is m x n, result is n x m 
+        int m, int n)
     {
         if (index >= m * n) return;
     

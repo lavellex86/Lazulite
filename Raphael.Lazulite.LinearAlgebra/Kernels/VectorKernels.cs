@@ -1,16 +1,16 @@
 ﻿using ILGPU;
 using ILGPU.Runtime;
 
-namespace Raphael.Lazulite.Kernels;
+namespace Raphael.Lazulite.Suite;
 
-public static class VectorKernels
+public static partial class LinearAlgebra
 {
-    public static void OuterProductKernel(
+    public static void OuterProductKernelImpl(
         Index1D index,
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> x, 
         ArrayView1D<float, Stride1D.Dense> y, 
-        int m, int n) // x is m, y is n, result is m x n
+        int m, int n)
     {
         int totalElements = m * n;
         if (index >= totalElements) return;
@@ -20,4 +20,9 @@ public static class VectorKernels
     
         result[index] = x[row] * y[col];
     }
+    
+    public static void AxpyKernelImpl(Index1D index, 
+        ArrayView1D<float, Stride1D.Dense> x, 
+        ArrayView1D<float, Stride1D.Dense> y, 
+        float alpha) => y[index] = alpha * x[index] + y[index];
 }

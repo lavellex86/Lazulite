@@ -2,11 +2,10 @@
 using ILGPU.Runtime;
 using ILGPU.Runtime.Cuda;
 
-namespace Raphael.Lazulite;
+namespace Raphael.Lazulite.Suite;
 
-public partial class Compute
+public partial class LinearAlgebra
 {
-    
     public static void MatrixMultiply(
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a,
@@ -18,8 +17,8 @@ public partial class Compute
     {
         int aidx = a.AcceleratorIndex();
         var blas = GetCuBlas(aidx);
-        if (blas is null || noCuBlas || result.Length < 1e3)
-            Call(MatrixMultiplyKernel, result, a, b, a0, a1, b0, b1, alpha, beta, transposeA ? 1 : 0, transposeB ? 1 : 0);
+        if (blas is null || noCuBlas || result.Length < 1e3) 
+            Compute.Call(MatrixMultiplyKernel, result, a, b, a0, a1, b0, b1, alpha, beta, transposeA ? 1 : 0, transposeB ? 1 : 0);
         else
         {
             int m = transposeA ? a1 : a0;
@@ -48,7 +47,7 @@ public partial class Compute
         var blas = GetCuBlas(aidx);
 
         if (blas is null || noCuBlas || matrix.Length < 1e3)
-            Call(MatrixVectorMultiplyKernel, result, matrix, vector, m, n, alpha, beta, transposeMatrix ? 1 : 0);
+            Compute.Call(MatrixVectorMultiplyKernel, result, matrix, vector, m, n, alpha, beta, transposeMatrix ? 1 : 0);
         else
             blas.Gemv(
             transposeMatrix ? CuBlasOperation.Transpose : CuBlasOperation.NonTranspose,
@@ -61,5 +60,5 @@ public partial class Compute
     public static void Transpose(
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> matrix,
-        int m, int n) => Call(TransposeKernel, result, matrix, m, n);
+        int m, int n) => Compute.Call(TransposeKernel, result, matrix, m, n);
 }
