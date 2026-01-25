@@ -43,7 +43,7 @@ public class BufferPool<T> : IBufferPool, IDisposable where T : unmanaged
     } 
     
     public MemoryBuffer1D<T, Stride1D.Dense> Get(int aidx, int size, bool zero = true) => TryGetFrom(aidx, size, zero);
-    public MemoryBuffer1D<T, Stride1D.Dense> GetLike(MemoryBuffer1D<T, Stride1D.Dense> buffer, bool zero = true) => Get(buffer.AcceleratorIndex(), (int)buffer.Length, zero);
+    public MemoryBuffer1D<T, Stride1D.Dense> GetLike(ArrayView1D<T, Stride1D.Dense> buffer, bool zero = true) => Get(buffer.AcceleratorIndex(), (int)buffer.Length, zero);
 
     public MemoryBuffer1D<T, Stride1D.Dense>[] Get(int aidx, int size, int count, bool zero = true)
     {

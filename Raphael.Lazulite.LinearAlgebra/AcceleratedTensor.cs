@@ -115,11 +115,9 @@ public class MatrixProxy(AcceleratedMatrix acceleratedValue) : TensorProxy<float
     {
         var (rows, cols) = (value.GetLength(0), value.GetLength(1));
         var vector = new float[rows * cols];
-        //for (int i = 0; i < rows; i++)
-        Parallel.For(0, rows, i =>
-        {
-            for (int j = 0; j < cols; j++) vector[KernelProgramming.MatrixIndexOf(i, j, cols)] = value[i, j];
-        });
+        for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++) 
+            vector[KernelProgramming.MatrixIndexOf(i, j, cols)] = value[i, j];
         return vector;
     }
     
