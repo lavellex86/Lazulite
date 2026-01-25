@@ -2,12 +2,15 @@
 
 namespace Raphael.Lazulite;
 
+/// <summary>
+/// Stores kernel instances by their accelerator index.
+/// </summary>
 public class KernelStorage<T>(T action) where T : notnull
 {
-    public T Action { get; } = action;
-    public ConcurrentDictionary<int, T?> Kernels { get; } = [];
+    internal T Action { get; } = action;
+    internal ConcurrentDictionary<int, T?> Kernels { get; } = [];
     
-    public T? this[int index]
+    internal T? this[int index]
     {
         get
         {
