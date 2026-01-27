@@ -3,9 +3,9 @@ using ILGPU.Runtime;
 
 namespace Raphael.Lazulite.LinearAlgebra;
 
-public static partial class LinearAlgebraSuite
+public static partial class LinearAlgebraKernels
 {
-    public static void OuterProductKernelImpl(
+    private static void OuterProductKernelImpl(
         Index1D index,
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> x, 
@@ -21,7 +21,7 @@ public static partial class LinearAlgebraSuite
         result[index] = x[row] * y[col];
     }
     
-    public static void AxpyKernelImpl(Index1D index, 
+    private static void AxpyKernelImpl(Index1D index, 
         ArrayView1D<float, Stride1D.Dense> x, 
         ArrayView1D<float, Stride1D.Dense> y, 
         float alpha) => y[index] = alpha * x[index] + y[index];

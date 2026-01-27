@@ -2,6 +2,7 @@
 using ILGPU.Algorithms;
 using ILGPU.Algorithms.ScanReduceOperations;
 using ILGPU.Runtime;
+using static Raphael.Lazulite.LinearAlgebra.LinearAlgebraKernels;
 
 namespace Raphael.Lazulite.LinearAlgebra;
 

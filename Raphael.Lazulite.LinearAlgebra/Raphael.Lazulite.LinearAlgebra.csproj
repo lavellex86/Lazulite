@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.9.5.0-alpha</Version>
+    <Version>1.9.5.2-alpha</Version>
     <Title>Lazulite.LinearAlgebra</Title>
     <Authors>raphael286</Authors>
     <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>

@@ -12,9 +12,23 @@ public static class AcceleratedTensorExtensions
         return result;
     }
     
-    public static AcceleratedScalar AsScalar(this AcceleratedTensor<float> tensor) => new(tensor);
-    public static AcceleratedVector AsVector(this AcceleratedTensor<float[]> tensor) => new(tensor);
-    public static AcceleratedMatrix AsMatrix(this AcceleratedTensor<float[,]> tensor) => new(tensor, tensor.Shape);
+    public static AcceleratedScalar AsScalar(this AcceleratedTensor<float> tensor)
+    {
+        if (tensor is AcceleratedScalar scalar) return scalar;
+        return new AcceleratedScalar(tensor);
+    }
+
+    public static AcceleratedVector AsVector(this AcceleratedTensor<float[]> tensor)
+    {
+        if (tensor is AcceleratedVector vector) return vector;
+        return new AcceleratedVector(tensor);
+    }
+
+    public static AcceleratedMatrix AsMatrix(this AcceleratedTensor<float[,]> tensor)
+    {
+        if (tensor is AcceleratedMatrix matrix) return matrix;
+        return new AcceleratedMatrix(tensor, tensor.Shape);
+    }
 }
 
 public static class MemoryBufferExtensions

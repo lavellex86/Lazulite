@@ -1,6 +1,7 @@
 ﻿using ILGPU;
 using ILGPU.Runtime;
 using ILGPU.Runtime.Cuda;
+using static Raphael.Lazulite.LinearAlgebra.LinearAlgebraKernels;
 
 namespace Raphael.Lazulite.LinearAlgebra;
 

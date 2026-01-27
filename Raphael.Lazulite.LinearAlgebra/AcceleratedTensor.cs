@@ -4,7 +4,7 @@ using ILGPU.Runtime;
 namespace Raphael.Lazulite.LinearAlgebra;
 
 #region AcceleratedTensor
-public abstract class AcceleratedTensor<T>(MemoryBuffer1D<float, Stride1D.Dense> buffer, int[] shape) : AcceleratedValue<float, T>(buffer) where T : notnull
+public abstract class AcceleratedTensor<T>(MemoryBuffer1D<float, Stride1D.Dense> buffer, int[] shape) : AcceleratedValue<float, T>(buffer), IAcceleratedTensor where T : notnull
 {
     public int[] Shape { get; } = shape;
     public abstract TensorProxy<T> ToProxy();
@@ -20,6 +20,12 @@ public abstract class AcceleratedTensor<T>(MemoryBuffer1D<float, Stride1D.Dense>
     public AcceleratedTensor<T> CreateAlike(MemoryBuffer1D<float, Stride1D.Dense> buffer) => Create(buffer, Shape);
 
     public override BufferPool<float> Pool => Compute.FloatPool;
+}
+
+public interface IAcceleratedTensor
+{
+    public int[] Shape { get; }
+    public MemoryBuffer1D<float, Stride1D.Dense> Data { get; }
 }
 
 public abstract class TensorProxy<T>(float[] flatData, int[] shape) where T : notnull

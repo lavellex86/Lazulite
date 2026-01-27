@@ -3,9 +3,9 @@ using ILGPU.Runtime;
 
 namespace Raphael.Lazulite.LinearAlgebra;
 
-public static partial class LinearAlgebraSuite
+public static partial class LinearAlgebraKernels
 {
-    public static void MatrixMultiplyKernelImpl(
+    private static void MatrixMultiplyKernelImpl(
         Index1D index,
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a,
@@ -33,7 +33,7 @@ public static partial class LinearAlgebraSuite
         result[resultIdx] = alpha * sum + beta * result[resultIdx];
     }
 
-    public static void MatrixVectorMultiplyKernelImpl(
+    private static void MatrixVectorMultiplyKernelImpl(
         Index1D index,
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> matrix,
@@ -61,7 +61,7 @@ public static partial class LinearAlgebraSuite
         }
     }
 
-    public static void TransposeKernelImpl(
+    private static void TransposeKernelImpl(
         Index1D index,
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> matrix,

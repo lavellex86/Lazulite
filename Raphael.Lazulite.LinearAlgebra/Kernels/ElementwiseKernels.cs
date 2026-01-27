@@ -4,7 +4,7 @@ using ILGPU.Runtime;
 
 namespace Raphael.Lazulite.LinearAlgebra;
 
-public static partial class LinearAlgebraSuite
+public static partial class LinearAlgebraKernels
 {
     private static void FillKernelImpl(Index1D index, ArrayView1D<float, Stride1D.Dense> view, float value) => view[index] = value;
     private static void ConcatKernelImpl(Index1D index, ArrayView1D<float, Stride1D.Dense> result, ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b)
@@ -20,35 +20,35 @@ public static partial class LinearAlgebraSuite
     }
     
     #region Binary
-    public static void AddKernelImpl(
+    private static void AddKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a, 
         ArrayView1D<float, Stride1D.Dense> b) =>
         result[index] = a[index] + b[index];
     
-    public static void SubtractKernelImpl(
+    private static void SubtractKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a, 
         ArrayView1D<float, Stride1D.Dense> b) =>
         result[index] = a[index] - b[index];
     
-    public static void ElementwiseMultiplyKernelImpl(
+    private static void ElementwiseMultiplyKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a, 
         ArrayView1D<float, Stride1D.Dense> b) =>
         result[index] = a[index] * b[index];
     
-    public static void DivideKernelImpl(
+    private static void DivideKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a, 
         ArrayView1D<float, Stride1D.Dense> b) =>
         result[index] = a[index] / b[index];
     
-    public static void MaxKernelImpl(
+    private static void MaxKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a, 
@@ -56,98 +56,98 @@ public static partial class LinearAlgebraSuite
         result[index] = XMath.Max(a[index], b[index]);
     #endregion
     #region Unary
-    public static void ExpKernelImpl(
+    private static void ExpKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a) =>
         result[index] = XMath.Exp(a[index]);
 
-    public static void LogKernelImpl(
+    private static void LogKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a) =>
         result[index] = XMath.Log(a[index]);
     
-    public static void SqrtKernelImpl(
+    private static void SqrtKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a) =>
         result[index] = XMath.Sqrt(a[index]);
     
-    public static void AbsKernelImpl(
+    private static void AbsKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a) =>
         result[index] = XMath.Abs(a[index]);
     
-    public static void NegateKernelImpl(
+    private static void NegateKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a) =>
         result[index] = -a[index];
     
-    public static void SineKernelImpl(
+    private static void SineKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a) =>
         result[index] = XMath.Sin(a[index]);
     
-    public static void CosineKernelImpl(
+    private static void CosineKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a) =>
         result[index] = XMath.Cos(a[index]);
     
-    public static void TangentKernelImpl(
+    private static void TangentKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a) =>
         result[index] = XMath.Tan(a[index]);
     #endregion
     #region Weird Ones
-    public static void ScalarPowerKernelImpl(
+    private static void ScalarPowerKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a, 
         ArrayView1D<float, Stride1D.Dense> b) =>
         result[index] = XMath.Pow(a[index], b[0]);
 
-    public static void ScalarMultiplyKernelImpl(
+    private static void ScalarMultiplyKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a,
         ArrayView1D<float, Stride1D.Dense> b) =>
         result[index] = a[index] * b[0];
     
-    public static void ScalarDivideKernelImpl(
+    private static void ScalarDivideKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a,
         ArrayView1D<float, Stride1D.Dense> b) =>
         result[index] = a[index] / b[0];
     
-    public static void ScalarMaxKernelImpl(
+    private static void ScalarMaxKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a,
         ArrayView1D<float, Stride1D.Dense> b) =>
         result[index] = XMath.Max(a[index], b[0]);
     
-    public static void FloatPowerKernelImpl(
+    private static void FloatPowerKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a, 
         float power) =>
         result[index] = XMath.Pow(a[index], power);
     
-    public static void FloatMultiplyKernelImpl(
+    private static void FloatMultiplyKernelImpl(
         Index1D index,
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a, 
         float b) =>
         result[index] = a[index] * b;
 
-    public static void FloatMaxKernelImpl(
+    private static void FloatMaxKernelImpl(
         Index1D index, 
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> a, float b) =>
