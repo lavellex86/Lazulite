@@ -146,10 +146,6 @@ public static class Compute
     public static int RequestOptimalAccelerator() => GetAcceleratorIndex(Accelerators.Values.First());
     #endregion
     #endregion
-
-    #region Returns
-    
-    #endregion
     #region Helpers
     /// <summary>
     /// Returns the index of the given accelerator.
@@ -159,6 +155,7 @@ public static class Compute
     /// Whether the given accelerator is a GPU accelerator.
     /// </summary>
     public static bool IsGpuAccelerator(int aidx) => Accelerators[aidx] is CudaAccelerator;
+    
     
     #region Calls
     /// <summary>

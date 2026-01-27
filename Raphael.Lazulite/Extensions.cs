@@ -26,6 +26,14 @@ public static class MemoryBufferExtensions
         dest.CopyFrom(source);
         return dest;
     }
+    
+    public static void Return(this MemoryBuffer1D<float, Stride1D.Dense> buffer) => Compute.FloatPool.Return(buffer);
+    public static void Return(this MemoryBuffer1D<double, Stride1D.Dense> buffer) => Compute.DoublePool.Return(buffer);
+    public static void Return(this MemoryBuffer1D<int, Stride1D.Dense> buffer) => Compute.IntPool.Return(buffer);
+    public static void Return(this MemoryBuffer1D<uint, Stride1D.Dense> buffer) => Compute.UnsignedIntPool.Return(buffer);
+    public static void Return(this MemoryBuffer1D<long, Stride1D.Dense> buffer) => Compute.LongPool.Return(buffer);
+    public static void Return(this MemoryBuffer1D<ulong, Stride1D.Dense> buffer) => Compute.UnsignedLongPool.Return(buffer);
+    public static void Return(this MemoryBuffer1D<byte, Stride1D.Dense> buffer) => Compute.BytePool.Return(buffer);
 }
 
 public static class ArrayViewExtensions

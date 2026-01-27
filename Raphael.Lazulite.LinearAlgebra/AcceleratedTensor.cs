@@ -42,11 +42,10 @@ public abstract class TensorProxy<T>(float[] flatData, int[] shape) where T : no
 #region AcceleratedScalar
 public class AcceleratedScalar : AcceleratedTensor<float>
 {
-    public AcceleratedScalar(float value, int aidx) : base(Compute.FloatPool.Get(aidx, 1), []) => FromHost(value);
+    public AcceleratedScalar(float value, int aidx) : base(Compute.FloatPool.Get(aidx, 1).Set([value]), []) { }
     public AcceleratedScalar(MemoryBuffer1D<float, Stride1D.Dense> buffer) : base(buffer, []) { }
     
-    public override float Unroll(float[] rolled) => rolled[0];
-    public override float[] Roll(float value) => [value];
+    public override float Transform(float[] flattened) => flattened[0];
     public override AcceleratedScalar Create(MemoryBuffer1D<float, Stride1D.Dense> buffer, int[] shape) => new(buffer);
     public override ScalarProxy ToProxy() => new(this);
     
@@ -65,11 +64,10 @@ public class ScalarProxy(AcceleratedScalar acceleratedValue) : TensorProxy<float
 #region AcceleratedVector
 public class AcceleratedVector : AcceleratedTensor<float[]>
 {
-    public AcceleratedVector(float[] value, int aidx) : base(Compute.FloatPool.Get(aidx, value.Length), [value.Length]) => FromHost(value);
+    public AcceleratedVector(float[] value, int aidx) : base(Compute.FloatPool.Get(aidx, value.Length).Set(value), [value.Length]) { }
     public AcceleratedVector(MemoryBuffer1D<float, Stride1D.Dense> buffer) : base(buffer, [(int)buffer.Length]) { }
     
-    public override float[] Unroll(float[] rolled) => rolled;
-    public override float[] Roll(float[] value) => value;
+    public override float[] Transform(float[] rolled) => rolled;
     public override AcceleratedVector Create(MemoryBuffer1D<float, Stride1D.Dense> buffer, int[] shape) => new(buffer);
     public override VectorProxy ToProxy() => new(this);
     
@@ -89,12 +87,11 @@ public class VectorProxy(AcceleratedVector acceleratedValue) : TensorProxy<float
 public class AcceleratedMatrix : AcceleratedTensor<float[,]>
 {
     public AcceleratedMatrix(float[,] value, int aidx) : base(
-        Compute.FloatPool.Get(aidx, value.GetLength(0) * value.GetLength(1)),
-        [value.GetLength(0), value.GetLength(1)]) => FromHost(value);
+        Compute.FloatPool.Get(aidx, value.GetLength(0) * value.GetLength(1)).Set(MatrixProxy.Roll(value)),
+        [value.GetLength(0), value.GetLength(1)]) { }
     public AcceleratedMatrix(MemoryBuffer1D<float, Stride1D.Dense> buffer, int[] shape) : base(buffer, shape) { }
     
-    public override float[] Roll(float[,] value) => MatrixProxy.Roll(value);
-    public override float[,] Unroll(float[] rolled) => MatrixProxy.Unroll(rolled, Shape[1]);
+    public override float[,] Transform(float[] rolled) => MatrixProxy.Unroll(rolled, Shape[1]);
 
     public override AcceleratedMatrix Create(MemoryBuffer1D<float, Stride1D.Dense> buffer, int[] shape) => new(buffer, shape);
     public override MatrixProxy ToProxy() => new(this);

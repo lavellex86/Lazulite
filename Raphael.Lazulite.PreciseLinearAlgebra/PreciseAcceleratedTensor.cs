@@ -42,7 +42,7 @@ public class PreciseAcceleratedScalar : PreciseAcceleratedTensor<double>
     public PreciseAcceleratedScalar(double value, int aidx) : base(Compute.DoublePool.Get(aidx, 1), []) => FromHost(value);
     public PreciseAcceleratedScalar(MemoryBuffer1D<double, Stride1D.Dense> buffer) : base(buffer, []) { }
 
-    public override double Unroll(double[] rolled) => rolled[0];
+    public override double Transform(double[] rolled) => rolled[0];
     public override double[] Roll(double value) => [value];
     
     public override PreciseAcceleratedScalar Create(MemoryBuffer1D<double, Stride1D.Dense> buffer, int[] shape) => new PreciseAcceleratedScalar(buffer);
@@ -61,7 +61,7 @@ public class PreciseAcceleratedVector : PreciseAcceleratedTensor<double[]>
     public PreciseAcceleratedVector(double[] value, int aidx) : base(Compute.DoublePool.Get(aidx, value.Length), [value.Length]) => FromHost(value);
     public PreciseAcceleratedVector(MemoryBuffer1D<double, Stride1D.Dense> buffer) : base(buffer, [(int)buffer.Length]) { }
 
-    public override double[] Unroll(double[] rolled) => rolled;
+    public override double[] Transform(double[] rolled) => rolled;
     public override double[] Roll(double[] value) => value;
     
     public override PreciseAcceleratedVector Create(MemoryBuffer1D<double, Stride1D.Dense> buffer, int[] shape) => new(buffer);

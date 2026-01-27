@@ -10,7 +10,7 @@ public partial class LinearAlgebraSuite
     public static void Sum(ArrayView1D<float, Stride1D.Dense> result, ArrayView1D<float, Stride1D.Dense> a)
     {
         var aidx = a.AcceleratorIndex();
-        Compute.Accelerators[aidx].Reduce<float, AddFloat>(Compute.GetStream(aidx), a, result);
+        Compute.Accelerators[aidx].Reduce<float, AddFloat>(Compute.Accelerators[aidx].DefaultStream, a, result);
     }
     
     public static void Dot(

@@ -18,7 +18,6 @@ public abstract class AcceleratedValue<TData, THost>(MemoryBuffer1D<TData, Strid
     /// The total size of the underlying data buffer.
     /// </summary>
     public int TotalSize { get; } = (int)data.Length;
-
     /// <summary>
     /// The index of the accelerator that owns the underlying data buffer.
     /// </summary>
@@ -40,7 +39,7 @@ public abstract class AcceleratedValue<TData, THost>(MemoryBuffer1D<TData, Strid
     public THost ToHost()
     {
         Compute.Synchronize(AcceleratorIndex);
-        return Unroll(Data.View.GetAsArray1D());
+        return Transform(Data.View.GetAsArray1D());
     }
     /// <summary>
     /// Updates the contents of this value with the contents of the given value.
@@ -65,7 +64,7 @@ public abstract class AcceleratedValue<TData, THost>(MemoryBuffer1D<TData, Strid
     /// <summary>
     /// Transforms a <typeparamref name="TData"/> array into a <typeparamref name="THost"/>./>
     /// </summary>
-    public abstract THost Unroll(TData[] rolled);
+    public abstract THost Transform(TData[] flattened);
     
     public static implicit operator MemoryBuffer1D<TData, Stride1D.Dense>(AcceleratedValue<TData, THost> acceleratedValue) => acceleratedValue.Data;
     public static implicit operator ArrayView1D<TData, Stride1D.Dense>(AcceleratedValue<TData, THost> acceleratedValue) => acceleratedValue.Data.View;

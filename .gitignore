@@ -398,6 +398,7 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-publish.ps1
-publish.sh
+publish-core.ps1
+publish-extensions.ps1
+build-extensions.ps1
 nupkgs
