@@ -111,16 +111,7 @@ public static class Compute
     /// Returns the best accelerator for the given requirements.
     /// </summary>
     /// <param name="requireGPU">Whether a GPU accelerator is required.</param>
-    public static int RequestAccelerator(bool requireGPU = true)
-    {
-        Accelerator accelerator;
-        
-        if (requireGPU) accelerator = Accelerators.Values.FirstOrDefault(a => a is CudaAccelerator) ?? Accelerators.Values.First();
-        else accelerator = Accelerators.Values.First();
-        
-        var aidx = GetAcceleratorIndex(accelerator);
-        return aidx;
-    }
+    public static int RequestAccelerator(bool gpu) => gpu ? RequestGPU() : RequestCPU();
 
     /// <summary>
     /// Returns the best CPU accelerator available.

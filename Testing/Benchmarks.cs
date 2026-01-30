@@ -99,10 +99,8 @@ public static class Benchmarks
     private static float[,] RandomMatrix(int l, int w)
     {
         float[,] matrix = new float[l, w];
-        Parallel.For(0, l, i =>
-        {
-            for (int j = 0; j < w; j++) matrix[i, j] = (float)random.NextDouble();
-        });
+        for (int i = 0; i < l; i++)
+        for (int j = 0; j < w; j++) matrix[i, j] = random.NextSingle();
         return matrix;
     }
 }

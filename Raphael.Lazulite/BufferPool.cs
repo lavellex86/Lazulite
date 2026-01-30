@@ -104,5 +104,5 @@ public class BufferPool<T> : IDisposable where T : unmanaged
             while (stack.TryPop(out var buffer)) buffer.Dispose();
     }
 
-    private readonly KernelStorage<Action<Index1D, ArrayView1D<T, Stride1D.Dense>>> ZeroKernel = new((i, r) => r[i] = default);
+    private static readonly KernelStorage<Action<Index1D, ArrayView1D<T, Stride1D.Dense>>> ZeroKernel = new((i, r) => r[i] = default);
 }

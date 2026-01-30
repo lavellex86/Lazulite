@@ -6,7 +6,7 @@ namespace Testing;
 
 class Program
 {
-    public static void Main(string[] args)
+    public static void Main()
     {
         Console.WriteLine(Compute.Accelerators[0]);
         //SimpleTests.FillTest(false);
@@ -29,6 +29,6 @@ class Program
         Benchmarks.SquareBenchmark1(true);
         Benchmarks.SquareBenchmark2(true);
         Benchmarks.MatMulBenchmark(true);
-        Benchmarks.MatMulBenchmark(true, 10000, 10000, 10000, 1);
+        //Benchmarks.MatMulBenchmark(true, 10000, 10000, 10000, 1);
     }
 }

@@ -348,17 +348,15 @@ public static class SimpleTests
     public static float[,] RandomMatrix(int rows, int cols)
     {
         float[,] matrix = new float[rows, cols];
-        Parallel.For(0, rows, i =>
-        {
-            for (int j = 0; j < cols; j++) matrix[i, j] = (float)random.NextDouble();
-        });
+        for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++) matrix[i, j] = random.NextSingle();
         return matrix;
     }
 
     public static float[] RandomVector(int size)
     {
         float[] vector = new float[size];
-        for (int i = 0; i < size; i++) vector[i] = (float)random.NextDouble();
+        for (int i = 0; i < size; i++) vector[i] = random.NextSingle();
         return vector;
     }
 }

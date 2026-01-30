@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>1.9.5-alpha</Version>
+        <Version>1.9.6-alpha</Version>
         <Title>Lazulite</Title>
         <Authors>raphael286</Authors>
         <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>

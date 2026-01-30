@@ -42,7 +42,7 @@ public partial class LinearAlgebraSuite
         ArrayView1D<float, Stride1D.Dense> matrix,
         ArrayView1D<float, Stride1D.Dense> vector,
         int m, int n, float alpha = 1.0f, float beta = 0.0f,
-        bool transposeMatrix = false, bool noCuBlas = false) // matrix is m x n, vector is n, result is m
+        bool transposeMatrix = false, bool noCuBlas = false) // matrix is m x n, unless transposed- then its n x m, vector is n, result is m
     {
         var aidx = matrix.AcceleratorIndex();
         var blas = GetCuBlas(aidx);
