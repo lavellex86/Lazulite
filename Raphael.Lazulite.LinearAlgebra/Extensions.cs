@@ -45,7 +45,7 @@ public static class MemoryBufferExtensions
 
 public static class ArrayViewExtensions
 {
-    public static MemoryBuffer1D<float, Stride1D.Dense> Encase(this ArrayView1D<float, Stride1D.Dense> alike, Action<ArrayView1D<float, Stride1D.Dense>> action)
+    public static MemoryBuffer1D<float, Stride1D.Dense> Encase(this TensorArrayView alike, Action<TensorArrayView> action)
     {
         var result = Compute.FloatPool.Get(alike.AcceleratorIndex(), (int)alike.Length);
         action(result);

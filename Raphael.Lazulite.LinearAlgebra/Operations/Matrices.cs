@@ -8,9 +8,9 @@ namespace Raphael.Lazulite.LinearAlgebra;
 public partial class LinearAlgebraSuite
 {
     public static void MatrixMultiply(
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a,
-        ArrayView1D<float, Stride1D.Dense> b,
+        TensorArrayView result,
+        TensorArrayView a,
+        TensorArrayView b,
         int a0, int a1, int b0, int b1,
         float alpha = 1.0f, float beta = 0.0f,
         bool transposeA = false, bool transposeB = false,
@@ -38,9 +38,9 @@ public partial class LinearAlgebraSuite
     }
 
     public static void MatrixVectorMultiply(
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> matrix,
-        ArrayView1D<float, Stride1D.Dense> vector,
+        TensorArrayView result,
+        TensorArrayView matrix,
+        TensorArrayView vector,
         int m0, int m1, float alpha = 1.0f, float beta = 0.0f,
         bool transposeMatrix = false, bool noCuBlas = false)
     {
@@ -64,7 +64,7 @@ public partial class LinearAlgebraSuite
     }
 
     public static void Transpose(
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> matrix,
+        TensorArrayView result,
+        TensorArrayView matrix,
         int m, int n) => Compute.Call(TransposeKernel, result, matrix, m, n);
 }

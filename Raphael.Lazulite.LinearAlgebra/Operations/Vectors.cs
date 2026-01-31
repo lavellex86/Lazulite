@@ -8,16 +8,16 @@ namespace Raphael.Lazulite.LinearAlgebra;
 
 public partial class LinearAlgebraSuite
 {
-    public static void Sum(ArrayView1D<float, Stride1D.Dense> result, ArrayView1D<float, Stride1D.Dense> a)
+    public static void Sum(TensorArrayView result, TensorArrayView a)
     {
         var aidx = a.AcceleratorIndex();
         Compute.Accelerators[aidx].Reduce<float, AddFloat>(Compute.Accelerators[aidx].DefaultStream, a, result);
     }
     
     public static void Dot(
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a, 
-        ArrayView1D<float, Stride1D.Dense> b, 
+        TensorArrayView result,
+        TensorArrayView a, 
+        TensorArrayView b, 
         bool noCuBlas = false)
     {
         var aidx = a.AcceleratorIndex();
@@ -35,8 +35,8 @@ public partial class LinearAlgebraSuite
 
     public static void Axpy(
         float alpha,
-        ArrayView1D<float, Stride1D.Dense> x,
-        ArrayView1D<float, Stride1D.Dense> y,
+        TensorArrayView x,
+        TensorArrayView y,
         bool noCuBlas = false)
     {
         var aidx = x.AcceleratorIndex();
@@ -48,7 +48,7 @@ public partial class LinearAlgebraSuite
 
     public static void Scale(
         float alpha,
-        ArrayView1D<float, Stride1D.Dense> x,
+        TensorArrayView x,
         bool noCuBlas = false)
     {
         var aidx = x.AcceleratorIndex();
@@ -59,9 +59,9 @@ public partial class LinearAlgebraSuite
     }
 
     public static void OuterProduct(
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> x,
-        ArrayView1D<float, Stride1D.Dense> y,
+        TensorArrayView result,
+        TensorArrayView x,
+        TensorArrayView y,
         int m, int n, float alpha = 1.0f,
         bool noCuBlas = false) // x is m, y is n, result is m x n 
     {

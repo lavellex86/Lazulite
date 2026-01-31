@@ -6,151 +6,39 @@ namespace Raphael.Lazulite.LinearAlgebra;
 
 public static partial class LinearAlgebraKernels
 {
-    private static void FillKernelImpl(Index1D index, ArrayView1D<float, Stride1D.Dense> view, float value) => view[index] = value;
-    private static void ConcatKernelImpl(Index1D index, ArrayView1D<float, Stride1D.Dense> result, ArrayView1D<float, Stride1D.Dense> a, ArrayView1D<float, Stride1D.Dense> b)
+    private static void FillKernelImpl(Index1D i, TensorArrayView view, float value) => view[i] = value;
+    private static void ConcatKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, TensorArrayView b) => result[i] = i < a.Length ? a[i] : b[i - a.Length];
+
+    private static void SliceKernelImpl(Index1D i, TensorArrayView dest, TensorArrayView source, int start, int end)
     {
-        if (index < a.Length)
-            result[index] = a[index];
-        else
-            result[index] = b[index - a.Length];
-    }
-    private static void SliceKernelImpl(Index1D index, ArrayView1D<float, Stride1D.Dense> dest, ArrayView1D<float, Stride1D.Dense> source, int start, int end)
-    {
-        if (index >= start && index < end) dest[index - start] = source[index];
+        if (i >= start && i < end) dest[i - start] = source[i];
     }
     
     #region Binary
-    private static void AddKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a, 
-        ArrayView1D<float, Stride1D.Dense> b) =>
-        result[index] = a[index] + b[index];
+    private static void AddKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, TensorArrayView b) => result[i] = a[i] + b[i];
+    private static void SubtractKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, TensorArrayView b) => result[i] = a[i] - b[i];
+    private static void ElementwiseMultiplyKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, TensorArrayView b) => result[i] = a[i] * b[i];
+    private static void DivideKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, TensorArrayView b) => result[i] = a[i] / b[i];
     
-    private static void SubtractKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a, 
-        ArrayView1D<float, Stride1D.Dense> b) =>
-        result[index] = a[index] - b[index];
-    
-    private static void ElementwiseMultiplyKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a, 
-        ArrayView1D<float, Stride1D.Dense> b) =>
-        result[index] = a[index] * b[index];
-    
-    private static void DivideKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a, 
-        ArrayView1D<float, Stride1D.Dense> b) =>
-        result[index] = a[index] / b[index];
-    
-    private static void MaxKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a, 
-        ArrayView1D<float, Stride1D.Dense> b) =>
-        result[index] = XMath.Max(a[index], b[index]);
+    private static void MaxKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, TensorArrayView b) => result[i] = XMath.Max(a[i], b[i]);
     #endregion
     #region Unary
-    private static void ExpKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a) =>
-        result[index] = XMath.Exp(a[index]);
-
-    private static void LogKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a) =>
-        result[index] = XMath.Log(a[index]);
-    
-    private static void SqrtKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a) =>
-        result[index] = XMath.Sqrt(a[index]);
-    
-    private static void AbsKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a) =>
-        result[index] = XMath.Abs(a[index]);
-    
-    private static void NegateKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a) =>
-        result[index] = -a[index];
-    
-    private static void SineKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a) =>
-        result[index] = XMath.Sin(a[index]);
-    
-    private static void CosineKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a) =>
-        result[index] = XMath.Cos(a[index]);
-    
-    private static void TangentKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a) =>
-        result[index] = XMath.Tan(a[index]);
+    private static void ExpKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a) => result[i] = XMath.Exp(a[i]);
+    private static void LogKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a) => result[i] = XMath.Log(a[i]);
+    private static void SqrtKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a) => result[i] = XMath.Sqrt(a[i]);
+    private static void AbsKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a) => result[i] = XMath.Abs(a[i]);
+    private static void NegateKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a) => result[i] = -a[i];
+    private static void SineKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a) => result[i] = XMath.Sin(a[i]);
+    private static void CosineKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a) => result[i] = XMath.Cos(a[i]);
+    private static void TangentKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a) => result[i] = XMath.Tan(a[i]);
     #endregion
-    #region Weird Ones
-    private static void ScalarPowerKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a, 
-        ArrayView1D<float, Stride1D.Dense> b) =>
-        result[index] = XMath.Pow(a[index], b[0]);
-
-    private static void ScalarMultiplyKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a,
-        ArrayView1D<float, Stride1D.Dense> b) =>
-        result[index] = a[index] * b[0];
-    
-    private static void ScalarDivideKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a,
-        ArrayView1D<float, Stride1D.Dense> b) =>
-        result[index] = a[index] / b[0];
-    
-    private static void ScalarMaxKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a,
-        ArrayView1D<float, Stride1D.Dense> b) =>
-        result[index] = XMath.Max(a[index], b[0]);
-    
-    private static void FloatPowerKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a, 
-        float power) =>
-        result[index] = XMath.Pow(a[index], power);
-    
-    private static void FloatMultiplyKernelImpl(
-        Index1D index,
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a, 
-        float b) =>
-        result[index] = a[index] * b;
-
-    private static void FloatMaxKernelImpl(
-        Index1D index, 
-        ArrayView1D<float, Stride1D.Dense> result,
-        ArrayView1D<float, Stride1D.Dense> a, float b) =>
-        result[index] = XMath.Max(a[index], b);
+    #region Scalar & Float
+    private static void ScalarPowerKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, TensorArrayView b) => result[i] = XMath.Pow(a[i], b[0]);
+    private static void ScalarMultiplyKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, TensorArrayView b) => result[i] = a[i] * b[0];
+    private static void ScalarDivideKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, TensorArrayView b) => result[i] = a[i] / b[0];
+    private static void ScalarMaxKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, TensorArrayView b) => result[i] = XMath.Max(a[i], b[0]);
+    private static void FloatPowerKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, float power) => result[i] = XMath.Pow(a[i], power);
+    private static void FloatMultiplyKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, float b) => result[i] = a[i] * b;
+    private static void FloatMaxKernelImpl(Index1D i, TensorArrayView result, TensorArrayView a, float b) => result[i] = XMath.Max(a[i], b);
     #endregion
 }
