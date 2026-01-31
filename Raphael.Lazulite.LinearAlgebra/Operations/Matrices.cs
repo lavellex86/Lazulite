@@ -41,21 +41,26 @@ public partial class LinearAlgebraSuite
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> matrix,
         ArrayView1D<float, Stride1D.Dense> vector,
-        int m, int n, float alpha = 1.0f, float beta = 0.0f,
-        bool transposeMatrix = false, bool noCuBlas = false) // matrix is m x n, unless transposed- then its n x m, vector is n, result is m
+        int m0, int m1, float alpha = 1.0f, float beta = 0.0f,
+        bool transposeMatrix = false, bool noCuBlas = false)
     {
         var aidx = matrix.AcceleratorIndex();
         var blas = GetCuBlas(aidx);
+        var v0 = (int)vector.Length;
 
         if (blas is null || noCuBlas || matrix.Length < 1e3)
-            Compute.Call(MatrixVectorMultiplyKernel, result, matrix, vector, m, n, alpha, beta, transposeMatrix ? 1 : 0);
+            Compute.Call(MatrixVectorMultiplyKernel, result, matrix, vector, m0, m1, v0, alpha, beta, transposeMatrix ? 1 : 0);
         else
+        {
+            var m = transposeMatrix ? m1 : m0;
+            var n = transposeMatrix ? m0 : m1;
             blas.Gemv(
-            transposeMatrix ? CuBlasOperation.Transpose : CuBlasOperation.NonTranspose,
-            n, m, alpha,
-            matrix.BaseView, n,
-            vector.AsGeneral(), beta,
-            result.AsGeneral());
+                transposeMatrix ? CuBlasOperation.Transpose : CuBlasOperation.NonTranspose,
+                n, m, alpha,
+                matrix.BaseView, m1,
+                vector.AsGeneral(), beta,
+                result.AsGeneral());
+        }
     }
 
     public static void Transpose(

@@ -50,7 +50,7 @@ public partial class LinearAlgebraKernels
     public static KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>, 
         int, int, int, int, float, float, int, int>> MatrixMultiplyKernel { get; } = new(MatrixMultiplyKernelImpl);
     public static KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>, 
-        int, int, float, float, int>> MatrixVectorMultiplyKernel { get; } = new(MatrixVectorMultiplyKernelImpl);
+        int, int, int, float, float, int>> MatrixVectorMultiplyKernel { get; } = new(MatrixVectorMultiplyKernelImpl);
     public static KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>, int, int>> TransposeKernel { get; } = new(TransposeKernelImpl);
     #endregion
     #region Vector Kernels

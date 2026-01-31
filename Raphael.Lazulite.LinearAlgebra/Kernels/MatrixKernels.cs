@@ -38,26 +38,22 @@ public static partial class LinearAlgebraKernels
         ArrayView1D<float, Stride1D.Dense> result,
         ArrayView1D<float, Stride1D.Dense> matrix,
         ArrayView1D<float, Stride1D.Dense> vector,
-        int m, int n,
+        int m0, int m1, int v0,
         float alpha, float beta, int transposeMatrix)
     {
+        if (index >= m0) return;
+        
         if (transposeMatrix == 1)
         {
-            int col = index.X;
-            if (col >= n) return;
-
-            float sum = 0;
-            for (int row = 0; row < m; row++) sum += matrix[row * n + col] * vector[row];
-            result[col] = alpha * sum + beta * result[col];
+            var sum = 0f;
+            for (int row = 0; row < m1; row++) sum += matrix[row * m1 + index] * vector[row];
+            result[index] = alpha * sum + beta * result[index];
         }
         else
         {
-            int row = index.X;
-            if (row >= m) return;
-
-            float sum = 0;
-            for (int col = 0; col < n; col++) sum += matrix[row * n + col] * vector[col];
-            result[row] = alpha * sum + beta * result[row];
+            var sum = 0f;
+            for (int col = 0; col < m1; col++) sum += matrix[index * m1 + col] * vector[col];
+            result[index] = alpha * sum + beta * result[index];
         }
     }
 
