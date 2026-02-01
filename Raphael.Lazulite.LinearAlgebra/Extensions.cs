@@ -29,6 +29,12 @@ public static class AcceleratedTensorExtensions
         if (tensor is AcceleratedMatrix matrix) return matrix;
         return new AcceleratedMatrix(tensor, tensor.Shape);
     }
+
+    public static AcceleratedTensor<T> AsTensor<T>(this AcceleratedValue<float, T> value) where T : notnull
+    {
+        if (value is AcceleratedTensor<T> tensor) return tensor;
+        throw new InvalidOperationException("Value is not a tensor.");
+    }
 }
 
 public static class MemoryBufferExtensions

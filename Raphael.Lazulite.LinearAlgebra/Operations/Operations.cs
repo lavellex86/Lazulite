@@ -7,7 +7,7 @@ namespace Raphael.Lazulite.LinearAlgebra;
 
 public partial class LinearAlgebraSuite
 {
-    private readonly static Dictionary<int, CuBlas?> _cublasHandles = [];
+    private readonly static Dictionary<int, CuBlas<CuBlasPointerModeHandlers.AutomaticMode>?> _cublasHandles = [];
 
     private static void InitializeCuBlas()
     {
@@ -24,12 +24,12 @@ public partial class LinearAlgebraSuite
         _cublasHandles.Clear();
     }
 
-    private static CuBlas? GetCuBlas(int aidx)
+    private static CuBlas<CuBlasPointerModeHandlers.AutomaticMode>? GetCuBlas(int aidx)
     {
         if (_cublasHandles.TryGetValue(aidx, out var blas) || Compute.Accelerators[aidx] is not CudaAccelerator cudaAccelerator) return blas;
         try
         {
-            blas = new CuBlas(cudaAccelerator);
+            blas = new CuBlas<CuBlasPointerModeHandlers.AutomaticMode>(cudaAccelerator);
             _cublasHandles[aidx] = blas;
         }
         catch (Exception) { _cublasHandles[aidx] = null; }

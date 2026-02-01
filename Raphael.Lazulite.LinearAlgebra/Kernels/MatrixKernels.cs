@@ -46,7 +46,7 @@ public static partial class LinearAlgebraKernels
         if (transposeMatrix == 1)
         {
             var sum = 0f;
-            for (int row = 0; row < m1; row++) sum += matrix[row * m0 + i] * vector[row];
+            for (int col = 0; col < m0; col++) sum += matrix[col * m1 + i] * vector[col];
             result[i] = alpha * sum + beta * result[i];
         }
         else
