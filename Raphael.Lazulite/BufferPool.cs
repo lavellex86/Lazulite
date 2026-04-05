@@ -15,7 +15,7 @@ public class BufferPool<T> : IDisposable where T : unmanaged
     public BufferPool()
     {
         foreach (var aidx in Compute.Accelerators.Keys) _pool[aidx] = [];
-        Compute.BufferPoolHooks.Add(this);
+        Compute.PreHooks.Add(Dispose);
     }
     
     /// <summary>

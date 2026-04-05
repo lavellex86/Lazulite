@@ -6,7 +6,7 @@ namespace Testing;
 
 public static class Benchmarks
 {
-    private static int aidx = -1;
+    private static int aidx = Compute.RequestCPU();
     private static readonly Random random = new();
     private static readonly HashSet<int> printed = [];
 

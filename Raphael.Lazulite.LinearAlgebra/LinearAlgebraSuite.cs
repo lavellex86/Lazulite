@@ -10,6 +10,4 @@ public static partial class LinearAlgebraSuite
         InitializeCuBlas();
         AppDomain.CurrentDomain.ProcessExit += (_, _) => CleanupCuBlas();
     }
-    
-    public static BufferPool<float> Pool => Compute.FloatPool;
 }

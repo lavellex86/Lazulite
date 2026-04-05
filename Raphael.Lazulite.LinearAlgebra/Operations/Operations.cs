@@ -18,8 +18,8 @@ public partial class LinearAlgebraSuite
     {
         foreach (var handle in _cublasHandles.Values)
         {
-            try { handle?.Dispose(); }
-            catch { } // can't do anything about it now- this is at process exit
+            if (handle is null) continue;
+            handle.Dispose();
         }
         _cublasHandles.Clear();
     }

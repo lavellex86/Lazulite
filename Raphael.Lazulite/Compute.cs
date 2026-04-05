@@ -52,8 +52,16 @@ public static class Compute
     /// The default pool for <c>byte</c> buffers.
     /// </summary>
     public static BufferPool<byte> BytePool { get; }
-    
-    internal static List<IDisposable> BufferPoolHooks { get; } = [];
+    #endregion
+    #region Hooks
+    /// <summary>
+    /// Disposal actions that are executed before accelerator disposal.
+    /// </summary>
+    public static List<Action> PreHooks { get; } = [];
+    /// <summary>
+    /// Disposal actions that are executed after accelerator disposal.
+    /// </summary>
+    public static List<Action> PostHooks { get; } = [];
     #endregion
 
     private static Context _context { get; }
@@ -64,8 +72,7 @@ public static class Compute
     {
         _context = Context.Create(b => b
             .Default()
-            .EnableAlgorithms()
-            .AllAccelerators());
+            .EnableAlgorithms());
 
         HashSet<(AcceleratorType, string, long)> seen = [];
 
@@ -75,7 +82,7 @@ public static class Compute
                      .ThenByDescending(d => d.MemorySize).Where(device => seen.Add((device.AcceleratorType, device.Name, device.MemorySize))))
         {
             Accelerators[aidx] = device.CreateAccelerator(_context);
-            AcceleratorIndices[Accelerators[aidx].Name] = aidx;
+            AcceleratorIndices[Accelerators[aidx].Name] = aidx; 
             
             aidx++;
         }
@@ -582,9 +589,10 @@ public static class Compute
     {
         if (_disposed) return;
         GC.WaitForPendingFinalizers();
-        foreach (var pool in BufferPoolHooks) pool.Dispose();
+        foreach (var action in PreHooks) action();
         _context.Dispose();
         foreach (var accelerator in Accelerators.Values) accelerator.Dispose();
+        foreach (var action in PostHooks) action();
         _disposed = true;
     }
 }
