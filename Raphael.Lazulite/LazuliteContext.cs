@@ -1,12 +1,10 @@
-﻿using System.Collections.Concurrent;
-using ILGPU.Runtime;
+﻿using ILGPU.Runtime;
 
 namespace Raphael.Lazulite;
 
 public class LazuliteContext : IDisposable
 {
     public Accelerator Accelerator { get; }
-
     internal List<Action> DisposeHooks { get; } = [];
 
     public void Dispose()
