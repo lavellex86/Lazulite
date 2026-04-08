@@ -12,4 +12,6 @@ public class LazuliteContext : IDisposable
         foreach (var hook in DisposeHooks) hook();
         Accelerator.Dispose();
     }
+
+    public void Synchronize() => Accelerator.Synchronize();
 }

@@ -6,6 +6,7 @@ namespace Raphael.Lazulite;
 public class BufferPool<T>(LazuliteContext lctx) : IDisposable where T : unmanaged
 {
     private readonly Dictionary<long, Stack<MemoryBuffer1D<T, Stride1D.Dense>>> _pool = [];
+    internal readonly LazuliteContext _lctx = lctx;
 
     public void Return(MemoryBuffer1D<T, Stride1D.Dense> buffer) => (_pool.TryGetValue(buffer.Length, out var stack) ? stack : _pool[buffer.Length] = []).Push(buffer);
     public void Return(params IEnumerable<MemoryBuffer1D<T, Stride1D.Dense>> buffers)
@@ -19,7 +20,7 @@ public class BufferPool<T>(LazuliteContext lctx) : IDisposable where T : unmanag
         return buffer;
     }
 
-    private MemoryBuffer1D<T, Stride1D.Dense> Allocate(long length) => lctx.Accelerator.Allocate1D<T>(length);
+    private MemoryBuffer1D<T, Stride1D.Dense> Allocate(long length) => _lctx.Accelerator.Allocate1D<T>(length);
 
     public void Dispose()
     {
