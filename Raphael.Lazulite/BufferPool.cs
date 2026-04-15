@@ -13,7 +13,7 @@ public class BufferPool<T>(LazuliteContext lctx) : IDisposable where T : unmanag
     {
         foreach (var buffer in buffers) Return(buffer); 
     }
-    public MemoryBuffer1D<T, Stride1D.Dense> Get(long length, bool cleared = true)
+    public MemoryBuffer1D<T, Stride1D.Dense> Get(long length, bool cleared = false)
     {
         var buffer = _pool.GetValueOrDefault(length) is { Count: > 0 } stack ? stack.Pop() : Allocate(length);
         if (cleared) buffer.MemSetToZero();

@@ -3,7 +3,7 @@ using ILGPU.Runtime;
 
 namespace Raphael.Lazulite;
 
-public abstract class LazuliteBase<TElement, THost>(MemoryBuffer1D<TElement, Stride1D.Dense> buffer, BufferPool<TElement> pool) : IDisposable
+public abstract class RemoteBase<TElement, THost>(MemoryBuffer1D<TElement, Stride1D.Dense> buffer, BufferPool<TElement> pool) : IDisposable
     where TElement : unmanaged 
     where THost : notnull
 {
@@ -11,12 +11,15 @@ public abstract class LazuliteBase<TElement, THost>(MemoryBuffer1D<TElement, Str
     public bool NotDisposable { get; set; } = false;
     public bool Disposed { get; private set; } = false;
 
-    readonly protected BufferPool<TElement> _pool = pool;
+    public int IntLength { get; } = buffer.IntExtent;
+
+    public BufferPool<TElement> Pool { get; } = pool;
+    public LazuliteContext Context => pool._lctx;
     protected Action? _disposeHook;
 
     public THost ToHost()
     {
-        _pool._lctx.Accelerator.Synchronize();
+        Pool._lctx.Accelerator.Synchronize();
         return Convert(Buffer.GetAsArray1D());
     }
 
@@ -24,7 +27,7 @@ public abstract class LazuliteBase<TElement, THost>(MemoryBuffer1D<TElement, Str
     {
         if (NotDisposable) return;
         _disposeHook?.Invoke();
-        _pool.Return();
+        Pool.Return();
         Disposed = true;
     }
 

@@ -5,7 +5,7 @@ namespace Raphael.Lazulite;
 public class LazuliteContext : IDisposable
 {
     public Accelerator Accelerator { get; }
-    internal List<Action> DisposeHooks { get; } = [];
+    public List<Action> DisposeHooks { get; } = [];
 
     public void Dispose()
     {
