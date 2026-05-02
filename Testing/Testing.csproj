@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Raphael.Lazulite\Raphael.Lazulite.csproj" />
+    <ProjectReference Include="..\Raphael.Linalg32\Raphael.Linalg32.csproj" />
   </ItemGroup>
 
 </Project>

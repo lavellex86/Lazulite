@@ -1,2 +1,17 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using Raphael.Lazulite;
+using Raphael.Linalg32;
+
+namespace Testing;
+
+public static class Program
+{
+    public static void Main()
+    {
+        using var ctx = new LazuliteContext()
+            .EnableLinalg32();
+        var simpleTests = new SimpleTests(ctx);
+        
+        simpleTests.ElementwiseTest1();
+        simpleTests.ElementwiseTest1();
+    }
+}

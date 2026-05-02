@@ -1,14 +1,17 @@
-﻿using Raphael.Lazulite;
+﻿using ILGPU.Runtime.Cuda;
+using Raphael.Lazulite;
 
 namespace Raphael.Linalg32;
 
 public static partial class Extensions
 {
-    private static Dictionary<int, BufferPool<float>> _pools;
-    private static Dictionary<int, Kernels> _kernels;
+    private static Dictionary<int, BufferPool<float>> _pools = [];
+    private static Dictionary<int, Kernels> _kernels = [];
+    private static Dictionary<int, CuBlas<CuBlasPointerModeHandlers.AutomaticMode>> _cuBlasDict = [];
 
     private static BufferPool<float> GetPool(this LazuliteContext lctx) => _pools[lctx.GetHashCode()];
     private static Kernels GetKernels(this LazuliteContext lctx) => _kernels[lctx.GetHashCode()];
+    private static CuBlas<CuBlasPointerModeHandlers.AutomaticMode> GetCuBlas(this LazuliteContext lctx) => _cuBlasDict[lctx.GetHashCode()];
     
     public static RemoteScalar GetScalar(this LazuliteContext lctx, bool cleared = false) => 
         new(lctx.GetPool().Get(1, cleared), lctx.GetPool());

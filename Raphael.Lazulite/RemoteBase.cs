@@ -19,8 +19,14 @@ public abstract class RemoteBase<TElement, THost>(MemoryBuffer1D<TElement, Strid
 
     public THost ToHost()
     {
-        Pool._lctx.Accelerator.Synchronize();
-        return Convert(Buffer.GetAsArray1D());
+        Context.Synchronize();
+        return ConvertToHost(Buffer.GetAsArray1D());
+    }
+
+    public virtual RemoteBase<TElement, THost> Set(THost host)
+    {
+        Buffer.CopyFromCPU(ConvertToRaw(host));
+        return this;
     }
 
     public void Dispose()
@@ -31,6 +37,6 @@ public abstract class RemoteBase<TElement, THost>(MemoryBuffer1D<TElement, Strid
         Disposed = true;
     }
 
-    public abstract THost Convert(TElement[] raw);
-    
+    public abstract THost ConvertToHost(TElement[] raw);
+    public abstract TElement[] ConvertToRaw(THost host);
 }
