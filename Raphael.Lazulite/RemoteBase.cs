@@ -14,7 +14,7 @@ public abstract class RemoteBase<TElement, THost>(MemoryBuffer1D<TElement, Strid
     public int IntLength { get; } = buffer.IntExtent;
 
     public BufferPool<TElement> Pool { get; } = pool;
-    public LazuliteContext Context => pool._lctx;
+    public LazuliteContext Context => Pool._lctx;
     protected Action? _disposeHook;
 
     public THost ToHost()

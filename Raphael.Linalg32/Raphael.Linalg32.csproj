@@ -4,6 +4,15 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>Linalg32</Title>
+    <Authors>raphael286</Authors>
+    <Description>A linear-algbra extension library for Lazulite, working with floats.</Description>
+    <PackageProjectUrl>https://github.com/raphael286/Lazulite</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/raphael286/Lazulite.git</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <Version>2.0.0</Version>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,4 +24,8 @@
     <PackageReference Include="ILGPU.Algorithms" Version="1.5.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="../LICENSE" Pack="true" PackagePath="" />
+    <None Include="../README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
 </Project>

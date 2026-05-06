@@ -4,11 +4,24 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Version>2.0.0</Version>
+    <Title>Lazulite</Title>
+    <Authors>raphael286</Authors>
+    <Description>Quick &amp; powerful GPU acceleration for C#.</Description>
+    <PackageProjectUrl>https://github.com/raphael286/Lazulite</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/raphael286/Lazulite</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ILGPU" Version="1.5.3" />
     <PackageReference Include="ILGPU.Algorithms" Version="1.5.3" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <None Include="../LICENSE" Pack="true" PackagePath="" />
+    <None Include="../README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
 </Project>
