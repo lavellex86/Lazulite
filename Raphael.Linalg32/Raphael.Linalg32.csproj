@@ -10,10 +10,10 @@
     <PackageProjectUrl>https://github.com/raphael286/Lazulite</PackageProjectUrl>
     <RepositoryUrl>https://github.com/raphael286/Lazulite.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
-    <Version>2.0.2.1</Version>
+    <Version>2.0.2.2</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Updated IRemoteTensor</PackageReleaseNotes>
+    <PackageReleaseNotes>Updated IRemoteTensor (quick fix)</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

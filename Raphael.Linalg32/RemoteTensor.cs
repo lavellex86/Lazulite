@@ -12,6 +12,7 @@ public abstract class RemoteTensor<T>(FMB buffer, BufferPool<float> pool, int[] 
     public abstract RemoteTensor<T> Create(FMB buffer, BufferPool<float> pool, int[] shape);
     public RemoteTensor<T> Create(int[] shape, BufferPool<float> pool) => Create(pool.Get(shape.Aggregate((a, b) => a * b)), pool, shape);
     public RemoteTensor<T> Create(int[] shape) => Create(shape, Pool);
+    public RemoteTensor<T> Create() => Create(Shape);
 
     public override RemoteTensor<T> Set(T host)
     {
@@ -26,6 +27,7 @@ public abstract class RemoteTensor<T>(FMB buffer, BufferPool<float> pool, int[] 
     IRemoteTensor IRemoteTensor.Create(FMB buffer, BufferPool<float> pool, int[] shape) => Create(buffer, pool, shape);
     IRemoteTensor IRemoteTensor.Create(int[] shape, BufferPool<float> pool) => Create(shape, pool);
     IRemoteTensor IRemoteTensor.Create(int[] shape) => Create(shape);
+    IRemoteTensor IRemoteTensor.Create() => Create();
 }
 
 public class RemoteScalar(FMB buffer, BufferPool<float> pool) : RemoteTensor<float>(buffer, pool, [])

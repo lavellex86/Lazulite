@@ -9,4 +9,5 @@ public interface IRemoteTensor : IRemoteBase<float>
     public IRemoteTensor Create(FMB buffer, BufferPool<float> pool, int[] shape);
     public IRemoteTensor Create(int[] shape, BufferPool<float> pool);
     public IRemoteTensor Create(int[] shape);
+    public IRemoteTensor Create();
 }
