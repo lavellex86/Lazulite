@@ -4,7 +4,8 @@ using Raphael.Lazulite;
 
 namespace Raphael.Linalg32;
 
-public abstract class RemoteTensor<T>(FMB buffer, BufferPool<float> pool, int[] shape) : RemoteBase<float, T>(buffer, pool) where T : notnull
+public abstract class RemoteTensor<T>(FMB buffer, BufferPool<float> pool, int[] shape) : RemoteBase<float, T>(buffer, pool), IRemoteTensor 
+    where T : notnull
 {
     public int[] Shape { get; } = shape;
 
@@ -21,6 +22,10 @@ public abstract class RemoteTensor<T>(FMB buffer, BufferPool<float> pool, int[] 
 
     public static implicit operator FAV(RemoteTensor<T> tensor) => tensor.Buffer;
     public static implicit operator FMB(RemoteTensor<T> tensor) => tensor.Buffer;
+
+    IRemoteTensor IRemoteTensor.Create(FMB buffer, BufferPool<float> pool, int[] shape) => Create(buffer, pool, shape);
+    IRemoteTensor IRemoteTensor.Create(int[] shape, BufferPool<float> pool) => Create(shape, pool);
+    IRemoteTensor IRemoteTensor.Create(int[] shape) => Create(shape);
 }
 
 public class RemoteScalar(FMB buffer, BufferPool<float> pool) : RemoteTensor<float>(buffer, pool, [])
