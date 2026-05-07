@@ -1,15 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Raphael.Lazulite.LinearAlgebra\Raphael.Lazulite.LinearAlgebra.csproj" />
-      <ProjectReference Include="..\Raphael.Lazulite\Raphael.Lazulite.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Raphael.Lazulite\Raphael.Lazulite.csproj" />
+    <ProjectReference Include="..\Raphael.Linalg32\Raphael.Linalg32.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ILGPU" Version="1.5.3" />
+    <PackageReference Include="ILGPU.Algorithms" Version="1.5.3" />
+  </ItemGroup>
 
 </Project>

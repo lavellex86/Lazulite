@@ -1,362 +1,760 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using ILGPU;
-using ILGPU.Runtime;
+﻿using System.Diagnostics;
 using Raphael.Lazulite;
-using Raphael.Lazulite.LinearAlgebra;
+using Raphael.Linalg32;
 
 namespace Testing;
 
-public static class SimpleTests
+public class SimpleTests(LazuliteContext lctx)
 {
-    private static int aidx = -1;
-    private static Random random = new();
+    // ========== Tolerance for floating-point comparisons ==========
+    private const float EPSILON = 1e-5f;
 
-    public static void FillTest(bool gpu)
-    {
-        aidx = Compute.RequestAccelerator(gpu);
-        Console.WriteLine(Compute.IsGpuAccelerator(aidx) ? "GPU accelerator" : "CPU accelerator");
-        Stopwatch sw = new();
-
-        var (n, size) = (20000, 5000);
-
-        sw.Start();
-        for (int i = 0; i < n; i++)
-        {
-            var buffer = Compute.FloatPool.Get(aidx, size);
-            LinearAlgebraSuite.Fill(buffer, 1);
-            Compute.FloatPool.Return(buffer);
-        }
-        sw.Stop();
-        Compute.Synchronize(aidx);
-        Console.WriteLine($"Filled {n} vectors of size {size} in {sw.ElapsedMilliseconds} (no pre-allocations - {n * size} elements) where allocations are done in-loop.");
-
-        sw.Restart();
-        for (int i = 0; i < n; i++)
-        {
-            var buffer = Compute.FloatPool.Get(aidx, size);
-            LinearAlgebraSuite.Fill(buffer, 1);
-            Compute.FloatPool.Return(buffer);
-        }
-        sw.Stop();
-        Console.WriteLine($"Filled {n} vectors of size {size} in {sw.ElapsedMilliseconds} (pre-allocations - {n * size} elements) where allocations are done in-loop.");
-        Compute.Synchronize(aidx);
-    }
+    // ========== UTILITY METHODS ==========
     
-    public static void SimpleMathTest(bool gpu)
-    {
-        aidx = Compute.RequestAccelerator(gpu);
-        Console.WriteLine(Compute.IsGpuAccelerator(aidx) ? "GPU accelerator" : "CPU accelerator");
-        Stopwatch sw = new();
-        
-        var (n, size) = (200, 1000);
-
-        float[][,] matrices = new float[n][,];
-        for (int i = 0; i < n; i++)
-        {
-            float[,] matrix = new float[size, size];
-            for (int j = 0; j < size; j++) 
-            for (int k = 0; k < size; k++) matrix[j, k] = j + k;
-            matrices[i] = matrix;
-        }
-
-        AcceleratedMatrix[] buffers = new AcceleratedMatrix[n];
-        AcceleratedMatrix[] results = new AcceleratedMatrix[n];
-        for (int i = 0; i < n; i++) buffers[i] = new(matrices[i], aidx);
-        for (int i = 0; i < n; i++) results[i] = new(new float[size, size], aidx);
-
-        sw.Start();
-        for (int i = 0; i < n; i++) 
-            LinearAlgebraSuite.ElementwiseMultiply(results[i], buffers[i], buffers[i]);
-        Compute.Synchronize(aidx);
-        sw.Stop();
-        
-        Console.WriteLine($"Squared each element of {n} {size}x{size} matrices ({size * size * n} elements) in {sw.ElapsedMilliseconds} ms.");
-    }
-
-    public static void ScalarTest(bool gpu)
-    {
-        aidx = Compute.RequestAccelerator(gpu);
-        Console.WriteLine(Compute.IsGpuAccelerator(aidx) ? "GPU accelerator" : "CPU accelerator");
-        
-        AcceleratedScalar a = new(1, aidx);
-        AcceleratedScalar b = new(2, aidx);
-        AcceleratedScalar c = new(3, aidx);
-        
-        var d = a + b;
-        var e = d * c;
-        var f = e - a;
-        // this is bad- we allocated 3 values but only one is output
-        
-        Console.WriteLine(f);
-        
-        KernelStorage<Action<Index1D, 
-            ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>, 
-            ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>>> addMultSub
-            = new((i, r, a_, b_, c_) => r[i] = (a_[i] + b_[i]) * c_[i] - a_[i]);
-        Compute.Call(addMultSub, f.Data.View, a.Data.View, b.Data.View, c.Data.View);
-        // this is much better- we only allocate 1 value, f, and we can fuse the operations into one kernel call
-        Console.WriteLine(f);
-        
-        Compute.Synchronize(aidx);
-    }
+    private float[] RandomVector(int size) => new float[size].Select(_ => Random.Shared.NextSingle()).ToArray();
+    private float[] RandomVector(int size, float min, float max) => 
+        new float[size].Select(_ => min + Random.Shared.NextSingle() * (max - min)).ToArray();
     
-    public static void PhysicsTest(bool gpu)
+    private float[,] RandomMatrix(int rows, int cols)
     {
-        aidx = Compute.RequestAccelerator(gpu);
-        Console.WriteLine(Compute.IsGpuAccelerator(aidx) ? "GPU accelerator" : "CPU accelerator");
-        Stopwatch sw = new();
-
-        int finalT = 100; // end time
-        float dt = 0.01f; // time step size
-        int n = 1000; // number of bodies
-        float G = 6.674e-11f; // gravitational constant
-        Random random = new();
-
-        float[] positions = new float[n * 3];
-        float[] velocities = new float[n * 3];
-        float[] masses = new float[n];
-        float[] forces = new float[n * 3];
-        
-        Func<float, float, float> randomDouble = (min, max) => (float)random.NextDouble() * (max - min) + min;
-
-        for (int i = 0; i < n; i++)
-        {
-            (positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]) = (randomDouble(-10, 10), randomDouble(-10, 10), randomDouble(-10, 10));
-            (velocities[i * 3], velocities[i * 3 + 1], velocities[i * 3 + 2]) = (0, 0, 0);
-            masses[i] = randomDouble(1, 100);
-            (forces[i * 3], forces[i * 3 + 1], forces[i * 3 + 2]) = (0, 0, 0);
-        }
-
-        MemoryBuffer1D<float, Stride1D.Dense> positionsBuffer = Compute.FloatPool.Get(aidx, n * 3);
-        MemoryBuffer1D<float, Stride1D.Dense> velocitiesBuffer = Compute.FloatPool.Get(aidx, n * 3);
-        MemoryBuffer1D<float, Stride1D.Dense> massesBuffer = Compute.FloatPool.Get(aidx, n);
-        MemoryBuffer1D<float, Stride1D.Dense> forcesBuffer = Compute.FloatPool.Get(aidx, n * 3);
-        positionsBuffer.CopyFromCPU(positions);
-        velocitiesBuffer.CopyFromCPU(velocities);
-        massesBuffer.CopyFromCPU(masses);
-        forcesBuffer.CopyFromCPU(forces);
-        var extent = new Index1D(n);
-
-        KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>,
-            ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>, float, int>> gravityKernels = new((index, rs, ms, fs, g, total) =>
-        {
-            int i = index.X;
-            var (fx, fy, fz) = (0f, 0f, 0f);
-            var (rx, ry, rz) = KernelProgramming.Vector3Get(rs, i);
-
-            for (int j = 0; j < total; j++)
-            {
-                if (i == j) continue;
-
-                var (jrx, jry, jrz) = KernelProgramming.Vector3Get(rs, j);
-                var (dx, dy, dz) = KernelProgramming.Vector3Subtract((jrx, jry, jrz), (rx, ry, rz));
-
-                var r2 = KernelProgramming.Vector3Magnitude2((dx, dy, dz));
-                var f = g * ms[i] * ms[j] / r2;
-
-                var (dfx, dfy, dfz) = KernelProgramming.Vector3Multiply((dx, dy, dz), f);
-                (fx, fy, fz) = KernelProgramming.Vector3Add((fx, fy, fz), (dfx, dfy, dfz));
-            }
-
-            (fx, fy, fz) = KernelProgramming.Vector3Divide((fx, fy, fz), ms[i]);
-            KernelProgramming.Vector3Set(fs, i, (fx, fy, fz));
-        });
-        KernelStorage<Action<Index1D,
-            ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>,
-            ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>, float>> eulerKernels = new((index, rs, vs, fs, ms, dt_) =>
-        {
-            int i = index.X;
-            var (x, y, z) = KernelProgramming.Vector3Get(rs, i);
-            var (vx, vy, vz) = KernelProgramming.Vector3Get(vs, i);
-            var (fx, fy, fz) = KernelProgramming.Vector3Get(fs, i);
-
-            var (ax, ay, az) = KernelProgramming.Vector3Divide((fx, fy, fz), ms[i]);
-            var (dvx, dvy, dvz) = KernelProgramming.Vector3Multiply((ax, ay, az), dt_);
-            var (vx2, vy2, vz2) = KernelProgramming.Vector3Add((vx, vy, vz), (dvx, dvy, dvz));
-            KernelProgramming.Vector3Set(vs, i, (vx2, vy2, vz2));
-
-            var (drx, dry, drz) = KernelProgramming.Vector3Multiply((vx2, vy2, vz2), dt_);
-            var (x2, y2, z2) = KernelProgramming.Vector3Add((x, y, z), (drx, dry, drz));
-            KernelProgramming.Vector3Set(rs, i, (x2, y2, z2));
-        });
-        
-        sw.Start();
-        for (float t = 0; t < finalT; t += dt)
-        {
-            Compute.Call(aidx, gravityKernels, extent, positionsBuffer.View, massesBuffer.View, forcesBuffer.View, G, n);
-            Compute.Call(aidx, eulerKernels, extent, positionsBuffer.View, velocitiesBuffer.View, forcesBuffer.View, massesBuffer.View, dt);
-        }
-        Compute.Synchronize(aidx);
-        sw.Stop();
-        
-        Compute.FloatPool.Return(positionsBuffer, velocitiesBuffer, massesBuffer, forcesBuffer);
-        
-        Console.WriteLine($"Total timesteps: {finalT / dt}");
-        Console.WriteLine($"Total bodies: {n}");
-        Console.WriteLine($"Bodies processed per ms: {finalT / dt * n / sw.ElapsedMilliseconds:F2}");
-        Console.WriteLine($"Elapsed time: {sw.ElapsedMilliseconds} ms ({sw.ElapsedMilliseconds / (finalT/dt):F2} ms/timestep, or {finalT/dt / sw.ElapsedMilliseconds:F2} timesteps/ms)");
-    }
-    
-    public static void ParallelProcessingTest(bool gpu, bool cublas = true)
-    {
-        // this test has problems right now!
-        Console.WriteLine(cublas ? "Using cuBLAS" : "Using no-BLAS");
-        int totalBatches = 500;
-        var (m, k, n) = (256, 512, 256);
-        int mk = m * k;
-        int kn = k * n;
-        int mn = m * n;
-        Index1D extent = new(mn);
-
-        ConcurrentQueue<(float[] a, float[] b)> workQueue = [];
-        ConcurrentBag<MemoryBuffer1D<float, Stride1D.Dense>> results = new();
-        Random random = new();
-        
-        Console.WriteLine("Generating matrices...");
-        for (int i = 0; i < totalBatches; i++) workQueue.Enqueue((
-            MatrixProxy.Roll(RandomMatrix(m, k)), 
-            MatrixProxy.Roll(RandomMatrix(k, n))));
-
-        int aidx = Compute.RequestAccelerator(gpu);
-        Stopwatch sw = new();
-        
-        Console.WriteLine($"Starting processing on accelerator {aidx} ({Compute.Accelerators[aidx].Name}).");
-        sw.Start();
-        foreach (var (a, b) in workQueue)
-        {
-            var aBuffer = Compute.FloatPool.Get(aidx, mk);
-            var bBuffer = Compute.FloatPool.Get(aidx, kn);
-            var resultBuffer = Compute.FloatPool.Get(aidx, mn);
-            aBuffer.CopyFromCPU(a);
-            bBuffer.CopyFromCPU(b);
-            LinearAlgebraSuite.MatrixMultiply(aBuffer, bBuffer, resultBuffer, m, k, k, n, noCuBlas: !cublas);
-            results.Add(resultBuffer);
-            Compute.FloatPool.Return(aBuffer, bBuffer);
-        }
-        Compute.Synchronize(aidx);
-        sw.Stop();
-        
-        Console.WriteLine($"Processed {totalBatches} batches of {m}x{k}x{n} matrix multiplies in: {sw.ElapsedMilliseconds} ms.");
-        
-        Compute.FloatPool.Return(results.ToArray());
-        Compute.FloatPool.ClearAt(aidx);
-        results.Clear();
-        
-        var gpuIndices = Compute.Accelerators.Values
-            .Select((acc, idx) => (acc, idx))
-            .Where(x => x.acc.AcceleratorType != AcceleratorType.CPU)
-            .Select(x => x.idx)
-            .ToList(); // you can run this test with a CPU as well, but the tail will bite you unless you have a lottt of matrices
-
-        
-        Console.WriteLine("Starting parallel processing...");
-        sw.Restart();
-        Task[] tasks = new Task[gpuIndices.Count];
-        for (int i = 0; i < gpuIndices.Count; i++)
-        {
-            int aidx_ = gpuIndices[i];
-            Console.WriteLine($"Starting parallel processing on accelerator {aidx_} ({Compute.Accelerators[aidx_].Name}).");
-            tasks[i] = Task.Run(() =>
-            {
-                while (workQueue.TryDequeue(out var tuple))
-                {
-                    var aBuffer = Compute.FloatPool.Get(aidx_, mk);
-                    var bBuffer = Compute.FloatPool.Get(aidx_, kn);
-                    var resultBuffer = Compute.FloatPool.Get(aidx_, mn);
-        
-                    aBuffer.CopyFromCPU(tuple.a);
-                    bBuffer.CopyFromCPU(tuple.b);
-                    LinearAlgebraSuite.MatrixMultiply(aBuffer, bBuffer, resultBuffer, m, k, k, n, noCuBlas:!cublas);
-        
-                    results.Add(resultBuffer);
-                    Compute.FloatPool.Return(aBuffer, bBuffer);
-                }
-                Compute.Synchronize(aidx_);
-                Console.WriteLine($"{aidx_} finished processing!");
-            });
-        }
-        Task.WaitAll(tasks);
-        sw.Stop();
-        
-        Compute.FloatPool.Return(results.ToArray());
-        results.Clear();
-        Console.WriteLine($"Processed {totalBatches} batches of {m}x{k}x{n} matrix multiplies in: {sw.ElapsedMilliseconds} ms.");
-    }
-
-    public static void BigMatMulTest(bool gpu)
-    {
-        // this test has problems right now!
-        aidx = Compute.RequestAccelerator(gpu);
-        Console.WriteLine(Compute.IsGpuAccelerator(aidx) ? $"GPU accelerator {aidx}" : "CPU accelerator");
-        Stopwatch sw = new();
-        
-        int m = 10000;
-        int k = 10000;
-        int n = 10000;
-        int mk = m * k;
-        int kn = k * n;
-        int mn = m * n;
-        
-        float[,] a = RandomMatrix(m, k);
-        float[,] b = RandomMatrix(k, n);
-        MemoryBuffer1D<float, Stride1D.Dense> aBuffer = Compute.FloatPool.Get(aidx, mk);
-        MemoryBuffer1D<float, Stride1D.Dense> bBuffer = Compute.FloatPool.Get(aidx, kn);
-        MemoryBuffer1D<float, Stride1D.Dense> resultBuffer = Compute.FloatPool.Get(aidx, mn);
-        aBuffer.CopyFromCPU(MatrixProxy.Roll(a));
-        bBuffer.CopyFromCPU(MatrixProxy.Roll(b));
-        
-        Console.WriteLine("Starting processing...");
-        sw.Start();
-        LinearAlgebraSuite.MatrixMultiply(aBuffer, bBuffer, resultBuffer, m, k, k, n, noCuBlas: false);
-        Console.WriteLine("Finished processing!");
-        Compute.Synchronize(aidx);
-        sw.Stop();
-        
-        Console.WriteLine($"{m}x{k}x{n} matrix multiply finished in: {sw.ElapsedMilliseconds} ms.");
-        Compute.FloatPool.Return(resultBuffer, aBuffer, bBuffer);
-    }
-
-    public static void PoolTest(bool gpu)
-    {
-        aidx = Compute.RequestAccelerator(gpu);
-        Console.WriteLine(Compute.IsGpuAccelerator(aidx) ? $"GPU accelerator {aidx}" : "CPU accelerator");
-        Stopwatch sw = new();
-
-        var (n, size) = (1000, 10000);
-        KernelStorage<Action<Index1D, ArrayView1D<float, Stride1D.Dense>,
-            ArrayView1D<float, Stride1D.Dense>, ArrayView1D<float, Stride1D.Dense>>> kernels = new((i, r, a, b) => 
-            r[i] += (a[i] * a[i] - b[i] * b[i]) / (a[i] * a[i] + b[i] * b[i]));
-        var result = Compute.FloatPool.Get(aidx, size);
-        
-        sw.Start();
-        for (int i = 0; i < n; i++)
-        {
-            var bufferA = Compute.FloatPool.Get(aidx, size).Set(RandomVector(size));
-            var bufferB = Compute.FloatPool.Get(aidx, size).Set(RandomVector(size));
-
-            Compute.Call(kernels, result, bufferA, bufferB);
-            Compute.FloatPool.Return(bufferA, bufferB);
-        }
-        Compute.Synchronize(aidx);
-        sw.Stop();
-        
-        Console.WriteLine($"Processed {n} batches in {sw.ElapsedMilliseconds} ms.");
-        Compute.FloatPool.Return(result);
-    }
-    
-    public static float[,] RandomMatrix(int rows, int cols)
-    {
-        float[,] matrix = new float[rows, cols];
+        var matrix = new float[rows, cols];
         for (int i = 0; i < rows; i++)
-        for (int j = 0; j < cols; j++) matrix[i, j] = random.NextSingle();
+            for (int j = 0; j < cols; j++)
+                matrix[i, j] = Random.Shared.NextSingle();
         return matrix;
     }
-
-    public static float[] RandomVector(int size)
+    
+    private bool VectorsEqual(float[] a, float[] b) =>
+        a.Length == b.Length && a.Zip(b, (x, y) => Math.Abs(x - y) < EPSILON).All(x => x);
+    
+    private bool MatricesEqual(float[,] a, float[,] b)
     {
-        float[] vector = new float[size];
-        for (int i = 0; i < size; i++) vector[i] = random.NextSingle();
-        return vector;
+        if (a.GetLength(0) != b.GetLength(0) || a.GetLength(1) != b.GetLength(1)) return false;
+        for (int i = 0; i < a.GetLength(0); i++)
+            for (int j = 0; j < a.GetLength(1); j++)
+                if (Math.Abs(a[i, j] - b[i, j]) >= EPSILON) return false;
+        return true;
+    }
+
+    // ========== ARITHMETIC OPERATIONS TESTS ==========
+    
+    public void TestAddition()
+    {
+        Console.WriteLine("\n=== Testing Addition ===");
+        int[] sizes = { 1000, 10000, 100000, 1000000 };
+
+        foreach (int size in sizes)
+        {
+            var a = RandomVector(size);
+            var b = RandomVector(size);
+
+            using var ar = lctx.GetVector(size).Set(a);
+            using var br = lctx.GetVector(size).Set(b);
+            using var cr = lctx.GetVector(size);
+
+            var sw = Stopwatch.StartNew();
+            ar.Add(br, cr);
+            sw.Stop();
+            var gpuResult = cr.ToHost();
+
+            var cpuResult = a.Zip(b, (x, y) => x + y).ToArray();
+
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Size {size}: {sw.ElapsedMilliseconds}ms - {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+    }
+
+    public void TestSubtraction()
+    {
+        Console.WriteLine("\n=== Testing Subtraction ===");
+        int[] sizes = { 1000, 10000, 100000, 1000000 };
+
+        foreach (int size in sizes)
+        {
+            var a = RandomVector(size);
+            var b = RandomVector(size);
+
+            using var ar = lctx.GetVector(size).Set(a);
+            using var br = lctx.GetVector(size).Set(b);
+            using var cr = lctx.GetVector(size);
+
+            var sw = Stopwatch.StartNew();
+            ar.Subtract(br, cr);
+            sw.Stop();
+            var gpuResult = cr.ToHost();
+
+            var cpuResult = a.Zip(b, (x, y) => x - y).ToArray();
+
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Size {size}: {sw.ElapsedMilliseconds}ms - {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+    }
+
+    public void TestMultiplication()
+    {
+        Console.WriteLine("\n=== Testing Multiplication ===");
+        int[] sizes = { 1000, 10000, 100000, 1000000 };
+
+        foreach (int size in sizes)
+        {
+            var a = RandomVector(size);
+            var b = RandomVector(size);
+
+            using var ar = lctx.GetVector(size).Set(a);
+            using var br = lctx.GetVector(size).Set(b);
+            using var cr = lctx.GetVector(size);
+
+            var sw = Stopwatch.StartNew();
+            ar.Multiply(br, cr);
+            sw.Stop();
+            var gpuResult = cr.ToHost();
+
+            var cpuResult = a.Zip(b, (x, y) => x * y).ToArray();
+
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Size {size}: {sw.ElapsedMilliseconds}ms - {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+    }
+
+    public void TestDivision()
+    {
+        Console.WriteLine("\n=== Testing Division ===");
+        int[] sizes = { 1000, 10000, 100000, 1000000 };
+
+        foreach (int size in sizes)
+        {
+            var a = RandomVector(size, 0.1f, 10f);
+            var b = RandomVector(size, 0.1f, 10f);
+
+            using var ar = lctx.GetVector(size).Set(a);
+            using var br = lctx.GetVector(size).Set(b);
+            using var cr = lctx.GetVector(size);
+
+            var sw = Stopwatch.StartNew();
+            ar.Divide(br, cr);
+            sw.Stop();
+            var gpuResult = cr.ToHost();
+
+            var cpuResult = a.Zip(b, (x, y) => x / y).ToArray();
+
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Size {size}: {sw.ElapsedMilliseconds}ms - {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+    }
+
+    public void TestScalarOperations()
+    {
+        Console.WriteLine("\n=== Testing Scalar Operations ===");
+        int size = 100000;
+        var a = RandomVector(size);
+        float scalar = 2.5f;
+
+        using var ar = lctx.GetVector(size).Set(a);
+        using var addResult = lctx.GetVector(size);
+        using var mulResult = lctx.GetVector(size);
+        using var subResult = lctx.GetVector(size);
+        using var divResult = lctx.GetVector(size);
+
+        var sw = Stopwatch.StartNew();
+        ar.AddScalar(scalar, addResult);
+        sw.Stop();
+        var gpuAdd = addResult.ToHost();
+        var cpuAdd = a.Select(x => x + scalar).ToArray();
+        bool addCorrect = VectorsEqual(gpuAdd, cpuAdd);
+        Console.WriteLine($"AddScalar: {sw.ElapsedMilliseconds}ms - {(addCorrect ? "✓ PASS" : "✗ FAIL")}");
+
+        sw.Restart();
+        ar.SubtractScalar(scalar, subResult);
+        sw.Stop();
+        var gpuSub = subResult.ToHost();
+        var cpuSub = a.Select(x => x - scalar).ToArray();
+        bool subCorrect = VectorsEqual(gpuSub, cpuSub);
+        Console.WriteLine($"SubtractScalar: {sw.ElapsedMilliseconds}ms - {(subCorrect ? "✓ PASS" : "✗ FAIL")}");
+
+        sw.Restart();
+        ar.MultiplyScalar(scalar, mulResult);
+        sw.Stop();
+        var gpuMul = mulResult.ToHost();
+        var cpuMul = a.Select(x => x * scalar).ToArray();
+        bool mulCorrect = VectorsEqual(gpuMul, cpuMul);
+        Console.WriteLine($"MultiplyScalar: {sw.ElapsedMilliseconds}ms - {(mulCorrect ? "✓ PASS" : "✗ FAIL")}");
+
+        sw.Restart();
+        ar.DivideScalar(scalar, divResult);
+        sw.Stop();
+        var gpuDiv = divResult.ToHost();
+        var cpuDiv = a.Select(x => x / scalar).ToArray();
+        bool divCorrect = VectorsEqual(gpuDiv, cpuDiv);
+        Console.WriteLine($"DivideScalar: {sw.ElapsedMilliseconds}ms - {(divCorrect ? "✓ PASS" : "✗ FAIL")}");
+    }
+
+    // ========== MATHEMATICAL FUNCTIONS TESTS ==========
+    
+    public void TestTranscendentalFunctions()
+    {
+        Console.WriteLine("\n=== Testing Transcendental Functions ===");
+        int size = 10000;
+        var a = RandomVector(size, 0.1f, 3.14f); // Keep in reasonable range for trig functions
+
+        using var ar = lctx.GetVector(size).Set(a);
+
+        // Test Exp
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Exp(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Exp(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Exp: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        var a_positive = RandomVector(size, 0.1f, 100f);
+        using var ar_pos = lctx.GetVector(size).Set(a_positive);
+
+        // Test Log
+        using (var result = lctx.GetVector(size))
+        {
+            ar_pos.Log(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a_positive.Select(x => (float)Math.Log(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Log: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Log10
+        using (var result = lctx.GetVector(size))
+        {
+            ar_pos.Log10(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a_positive.Select(x => (float)Math.Log10(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Log10: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Log2
+        using (var result = lctx.GetVector(size))
+        {
+            ar_pos.Log2(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a_positive.Select(x => (float)Math.Log(x, 2)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Log2: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Sqrt
+        using (var result = lctx.GetVector(size))
+        {
+            ar_pos.Sqrt(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a_positive.Select(x => (float)Math.Sqrt(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Sqrt: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Sin
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Sin(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Sin(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Sin: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Cos
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Cos(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Cos(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Cos: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Tan
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Tan(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Tan(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Tan: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+    }
+
+    public void TestHyperbolicFunctions()
+    {
+        Console.WriteLine("\n=== Testing Hyperbolic Functions ===");
+        int size = 10000;
+        var a = RandomVector(size, -2f, 2f); // Keep in reasonable range
+
+        using var ar = lctx.GetVector(size).Set(a);
+
+        // Test Sinh
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Sinh(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Sinh(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Sinh: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Cosh
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Cosh(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Cosh(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Cosh: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Tanh
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Tanh(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Tanh(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Tanh: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+    }
+
+    public void TestRoundingFunctions()
+    {
+        Console.WriteLine("\n=== Testing Rounding Functions ===");
+        int size = 10000;
+        var a = RandomVector(size, -100f, 100f);
+
+        using var ar = lctx.GetVector(size).Set(a);
+
+        // Test Abs
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Abs(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => Math.Abs(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Abs: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Floor
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Floor(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Floor(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Floor: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Ceiling
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Ceiling(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Ceiling(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Ceiling: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Round
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Round(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Round(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Round: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Truncate
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Truncate(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Truncate(x)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Truncate: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Sign
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Sign(result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => Math.Sign(x)).ToArray();
+            bool correct = gpuResult.Zip(cpuResult, (g, c) => Math.Abs(g - c) < EPSILON).All(x => x);
+            Console.WriteLine($"Sign: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+    }
+
+    // ========== MIN/MAX TESTS ==========
+    
+    public void TestMinMax()
+    {
+        Console.WriteLine("\n=== Testing Min/Max Operations ===");
+        int size = 10000;
+        var a = RandomVector(size, -100f, 100f);
+        var b = RandomVector(size, -100f, 100f);
+
+        using var ar = lctx.GetVector(size).Set(a);
+        using var br = lctx.GetVector(size).Set(b);
+
+        // Test Min
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Min(br, result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Zip(b, (x, y) => Math.Min(x, y)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Min: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test Max
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Max(br, result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Zip(b, (x, y) => Math.Max(x, y)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Max: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test MinScalar
+        float scalar = 5.0f;
+        using (var result = lctx.GetVector(size))
+        {
+            ar.MinScalar(scalar, result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => Math.Min(x, scalar)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"MinScalar: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test MaxScalar
+        using (var result = lctx.GetVector(size))
+        {
+            ar.MaxScalar(scalar, result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => Math.Max(x, scalar)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"MaxScalar: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+    }
+
+    public void TestPower()
+    {
+        Console.WriteLine("\n=== Testing Power Functions ===");
+        int size = 10000;
+        var a = RandomVector(size, 0.1f, 10f);
+        var b = RandomVector(size, 0.5f, 3f);
+
+        using var ar = lctx.GetVector(size).Set(a);
+        using var br = lctx.GetVector(size).Set(b);
+
+        // Test Pow
+        using (var result = lctx.GetVector(size))
+        {
+            ar.Pow(br, result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Zip(b, (x, y) => (float)Math.Pow(x, y)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"Pow: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+
+        // Test PowScalar
+        float scalar = 2.0f;
+        using (var result = lctx.GetVector(size))
+        {
+            ar.PowScalar(scalar, result);
+            var gpuResult = result.ToHost();
+            var cpuResult = a.Select(x => (float)Math.Pow(x, scalar)).ToArray();
+            bool correct = VectorsEqual(gpuResult, cpuResult);
+            Console.WriteLine($"PowScalar: {(correct ? "✓ PASS" : "✗ FAIL")}");
+        }
+    }
+
+    // ========== VECTOR OPERATIONS TESTS ==========
+    
+    public void TestFill()
+    {
+        Console.WriteLine("\n=== Testing Fill Operation ===");
+        int size = 100000;
+        float value = 3.14f;
+
+        using var v = lctx.GetVector(size);
+        v.Fill(value);
+        var result = v.ToHost();
+        
+        bool correct = result.All(x => Math.Abs(x - value) < EPSILON);
+        Console.WriteLine($"Fill: {(correct ? "✓ PASS" : "✗ FAIL")}");
+    }
+
+    public void TestConcat()
+    {
+        Console.WriteLine("\n=== Testing Concat Operation ===");
+        int size = 1000;
+        var a = RandomVector(size);
+        var b = RandomVector(size);
+
+        using var ar = lctx.GetVector(size).Set(a);
+        using var br = lctx.GetVector(size).Set(b);
+        using var result = lctx.GetVector(size * 2);
+
+        ar.Concat(br, result);
+        var gpuResult = result.ToHost();
+
+        var cpuResult = a.Concat(b).ToArray();
+        bool correct = VectorsEqual(gpuResult, cpuResult);
+        Console.WriteLine($"Concat: {(correct ? "✓ PASS" : "✗ FAIL")}");
+    }
+
+    public void TestSlice()
+    {
+        Console.WriteLine("\n=== Testing Slice Operation ===");
+        int size = 1000;
+        var a = RandomVector(size);
+        int start = 100;
+        int length = 200;
+
+        using var ar = lctx.GetVector(size).Set(a);
+        using var result = lctx.GetVector(length);
+
+        ar.Slice(start, length, result);
+        var gpuResult = result.ToHost();
+
+        var cpuResult = a.Skip(start).Take(length).ToArray();
+        bool correct = VectorsEqual(gpuResult, cpuResult);
+        Console.WriteLine($"Slice: {(correct ? "✓ PASS" : "✗ FAIL")}");
+    }
+
+    public void TestNegate()
+    {
+        Console.WriteLine("\n=== Testing Negate ===");
+        int size = 10000;
+        var a = RandomVector(size, -100f, 100f);
+
+        using var ar = lctx.GetVector(size).Set(a);
+        using var result = lctx.GetVector(size);
+
+        ar.Negate(result);
+        var gpuResult = result.ToHost();
+        var cpuResult = a.Select(x => -x).ToArray();
+        bool correct = VectorsEqual(gpuResult, cpuResult);
+        Console.WriteLine($"Negate: {(correct ? "✓ PASS" : "✗ FAIL")}");
+    }
+
+    public void TestOuterProduct()
+    {
+        Console.WriteLine("\n=== Testing Outer Product ===");
+        int m = 50;
+        int n = 50;
+        var a = RandomVector(m);
+        var b = RandomVector(n);
+
+        using var ar = lctx.GetVector(m).Set(a);
+        using var br = lctx.GetVector(n).Set(b);
+        using var result = lctx.GetVector(m * n);
+
+        ar.OuterProduct(br, n, result);
+        var gpuResult = result.ToHost();
+
+        var cpuResult = new float[m * n];
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                cpuResult[i * n + j] = a[i] * b[j];
+
+        bool correct = VectorsEqual(gpuResult, cpuResult);
+        Console.WriteLine($"OuterProduct: {(correct ? "✓ PASS" : "✗ FAIL")}");
+    }
+
+    // ========== PERFORMANCE BENCHMARKS ==========
+    
+    public void BenchmarkElementwiseOperations()
+    {
+        Console.WriteLine("\n=== Benchmark: Elementwise Operations ===");
+        int[] sizes = { 1000, 10000, 100000, 1000000, 10000000 };
+
+        foreach (int size in sizes)
+        {
+            var a = RandomVector(size);
+            var b = RandomVector(size);
+
+            using var ar = lctx.GetVector(size).Set(a);
+            using var br = lctx.GetVector(size).Set(b);
+            using var cr = lctx.GetVector(size);
+
+            // Warmup
+            ar.Add(br, cr);
+            lctx.Synchronize();
+
+            // Benchmark Add
+            var sw = Stopwatch.StartNew();
+            for (int i = 0; i < 10; i++)
+            {
+                ar.Add(br, cr);
+            }
+            lctx.Synchronize();
+            sw.Stop();
+            double gpuTime = sw.ElapsedMilliseconds / 10.0;
+
+            sw.Restart();
+            for (int i = 0; i < 10; i++)
+            {
+                var _ = a.Zip(b, (x, y) => x + y).ToArray();
+            }
+            sw.Stop();
+            double cpuTime = sw.ElapsedMilliseconds / 10.0;
+
+            Console.WriteLine($"Size {size:D8}: GPU {gpuTime:F3}ms, CPU {cpuTime:F3}ms, Speedup {cpuTime/gpuTime:F2}x");
+        }
+    }
+
+    public void BenchmarkTranscendentalFunctions()
+    {
+        Console.WriteLine("\n=== Benchmark: Transcendental Functions ===");
+        int[] sizes = { 1000, 10000, 100000, 1000000 };
+
+        foreach (int size in sizes)
+        {
+            var a = RandomVector(size, 0.1f, 3.14f);
+
+            using var ar = lctx.GetVector(size).Set(a);
+            using var result = lctx.GetVector(size);
+
+            // Warmup
+            ar.Sqrt(result);
+            lctx.Synchronize();
+
+            // Benchmark Sqrt
+            var sw = Stopwatch.StartNew();
+            for (int i = 0; i < 10; i++)
+            {
+                ar.Sqrt(result);
+            }
+            lctx.Synchronize();
+            sw.Stop();
+            double gpuTime = sw.ElapsedMilliseconds / 10.0;
+
+            sw.Restart();
+            for (int i = 0; i < 10; i++)
+            {
+                var _ = a.Select(x => (float)Math.Sqrt(x)).ToArray();
+            }
+            sw.Stop();
+            double cpuTime = sw.ElapsedMilliseconds / 10.0;
+
+            Console.WriteLine($"Sqrt Size {size:D8}: GPU {gpuTime:F3}ms, CPU {cpuTime:F3}ms, Speedup {cpuTime/gpuTime:F2}x");
+        }
+    }
+
+    public void BenchmarkDifferentDataSizes()
+    {
+        Console.WriteLine($"\n=== Benchmark: Different Data Sizes on {lctx.AcceleratorName} ===");
+        int[] sizes = { 100, 1000, 10000, 100000, 1000000, 10000000 };
+
+        foreach (int size in sizes)
+        {
+            var a = RandomVector(size);
+            var b = RandomVector(size);
+
+            using var ar = lctx.GetVector(size).Set(a);
+            using var br = lctx.GetVector(size).Set(b);
+            using var cr = lctx.GetVector(size);
+
+            var sw = Stopwatch.StartNew();
+            ar.Multiply(br, cr);
+            lctx.Synchronize();
+            sw.Stop();
+
+            double gbPerSec = (size * sizeof(float) * 3 * 1e-9) / (sw.ElapsedMilliseconds * 1e-3);
+            Console.WriteLine($"Size {size:D8}: {sw.ElapsedMilliseconds:D4}ms, {gbPerSec:F2} GB/s");
+        }
+    }
+
+    // ========== STRESS TESTS ==========
+    
+    public void StressTestLargeOperations()
+    {
+        Console.WriteLine("\n=== Stress Test: Large Operations ===");
+        try
+        {
+            int size = (int)Math.Pow(2, 24); // 16 million floats
+            Console.WriteLine($"Allocating vectors of size {size}...");
+
+            var a = RandomVector(size);
+            var b = RandomVector(size);
+
+            using var ar = lctx.GetVector(size).Set(a);
+            using var br = lctx.GetVector(size).Set(b);
+            using var cr = lctx.GetVector(size);
+
+            var sw = Stopwatch.StartNew();
+            ar.Add(br, cr);
+            lctx.Synchronize();
+            sw.Stop();
+
+            var result = cr.ToHost();
+            Console.WriteLine($"Successfully processed {size} elements in {sw.ElapsedMilliseconds}ms - ✓ PASS");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Stress test failed: {ex.Message} - ✗ FAIL");
+        }
+    }
+
+    public void StressTestMemoryPool()
+    {
+        Console.WriteLine("\n=== Stress Test: Memory Pool ===");
+        try
+        {
+            int iterations = 100;
+            int size = 100000;
+            
+            for (int i = 0; i < iterations; i++)
+            {
+                var a = RandomVector(size);
+                using var ar = lctx.GetVector(size).Set(a);
+                using var result = lctx.GetVector(size);
+                ar.Sqrt(result);
+                _ = result.ToHost();
+                
+                if ((i + 1) % 20 == 0)
+                    Console.WriteLine($"  Completed {i + 1}/{iterations} iterations");
+            }
+            Console.WriteLine("Memory pool stress test - ✓ PASS");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Memory pool stress test failed: {ex.Message} - ✗ FAIL");
+        }
+    }
+
+    // ========== QUICK VERIFICATION TEST ==========
+    
+    public void ElementwiseTest1(int size = -1)
+    {
+        if (size == -1) size = (int)Math.Pow(2, 20);
+
+        var a = new float[size];
+        var b = new float[size];
+        
+        using var ar = lctx.GetVector(size).Set(a);
+        using var br = lctx.GetVector(size).Set(b);
+        using var cr = lctx.GetVector(size);
+
+        var sw = Stopwatch.StartNew();
+        ar.Add(br, cr);
+        sw.Stop();
+        
+        Console.WriteLine($"Elementwise add of size {size} took {sw.ElapsedMilliseconds}ms on {lctx.AcceleratorName}");
+        
+        sw.Restart();
+        var c = a.Zip(b, (x, y) => x + y);
+        sw.Stop();
+        
+        Console.WriteLine($"Elementwise add of size {size} took {sw.ElapsedMilliseconds}ms on CPU");
     }
 }
