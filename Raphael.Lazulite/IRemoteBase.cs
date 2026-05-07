@@ -13,4 +13,6 @@ public interface IRemoteBase<TElement> : IDisposable
     public int IntLength { get; }
     public BufferPool<TElement> Pool { get; }
     public LazuliteContext Context { get; }
+
+    public IRemoteBase<TElement> UpdateWith(MemoryBuffer1D<TElement, Stride1D.Dense> source);
 }

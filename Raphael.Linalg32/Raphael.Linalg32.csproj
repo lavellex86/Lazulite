@@ -6,19 +6,20 @@
     <Nullable>enable</Nullable>
     <Title>Linalg32</Title>
     <Authors>raphael286</Authors>
-    <Description>A linear-algbra extension library for Lazulite, working with floats.</Description>
+    <Description>A float-based linear algbra extension library for Lazulite.</Description>
     <PackageProjectUrl>https://github.com/raphael286/Lazulite</PackageProjectUrl>
     <RepositoryUrl>https://github.com/raphael286/Lazulite.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
-    <Version>2.0.1</Version>
+    <Version>2.0.2</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>Keeping up to date with Lazulite 2.0.2</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ILGPU" Version="1.5.3" />
     <PackageReference Include="ILGPU.Algorithms" Version="1.5.3" />
-    <PackageReference Include="Raphael.Lazulite" Version="2.0.1" />
+    <PackageReference Include="Raphael.Lazulite" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>

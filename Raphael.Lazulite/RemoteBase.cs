@@ -3,7 +3,7 @@ using ILGPU.Runtime;
 
 namespace Raphael.Lazulite;
 
-public abstract class RemoteBase<TElement, THost>(MemoryBuffer1D<TElement, Stride1D.Dense> buffer, BufferPool<TElement> pool) : IDisposable
+public abstract class RemoteBase<TElement, THost>(MemoryBuffer1D<TElement, Stride1D.Dense> buffer, BufferPool<TElement> pool) : IDisposable, IRemoteBase<TElement>
     where TElement : unmanaged 
     where THost : notnull
 {
@@ -29,6 +29,12 @@ public abstract class RemoteBase<TElement, THost>(MemoryBuffer1D<TElement, Strid
         return this;
     }
 
+    public virtual RemoteBase<TElement, THost> UpdateWith(MemoryBuffer1D<TElement, Stride1D.Dense> source)
+    {
+        Buffer.CopyFrom(source);
+        return this;
+    }
+
     public void Dispose()
     {
         if (NotDisposable) return;
@@ -39,4 +45,6 @@ public abstract class RemoteBase<TElement, THost>(MemoryBuffer1D<TElement, Strid
 
     public abstract THost ConvertToHost(TElement[] raw);
     public abstract TElement[] ConvertToRaw(THost host);
+
+    IRemoteBase<TElement> IRemoteBase<TElement>.UpdateWith(MemoryBuffer1D<TElement, Stride1D.Dense> source) => UpdateWith(source);
 }
