@@ -52,7 +52,6 @@ internal class Kernels(LazuliteContext lctx)
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV>> NegateKernel = new(Implementations.Negate, lctx);
     
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV, int>> OuterProductKernel = new(Implementations.OuterProduct, lctx);
-    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, float>> AxpyKernel = new(Implementations.Axpy, lctx);
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV, int, int, float, float, int>> MatrixMultiplyKernel = new(Implementations.MatrixMultiply, lctx);
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, int>> TransposeKernel = new(Implementations.Transpose, lctx);
 }

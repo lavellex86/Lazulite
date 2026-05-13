@@ -28,4 +28,7 @@ public static partial class Extensions
         _kernels[lctx.GetHashCode()] = new(lctx);
         return lctx;
     }
+
+    public static RemoteVector AsVector<T>(this RemoteTensor<T> tensor) where T : notnull => new(tensor.Buffer, tensor.Pool);
+    public static RemoteMatrix AsMatrix<T>(this RemoteTensor<T> tensor) where T : notnull => new(tensor.Buffer, tensor.Pool, tensor.IntLength);
 }

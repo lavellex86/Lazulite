@@ -53,7 +53,6 @@ internal partial class Implementations
     internal static void Negate(Index1D i, FAV r, FAV a) => r[i] = -a[i];
 
     internal static void OuterProduct(Index1D i, FAV r, FAV a, FAV b, int n) => r[i] = a[i / n] * b[i % n];
-    internal static void Axpy(Index1D i, FAV r, FAV a, float alpha) => r[i] = alpha * a[i] + r[i];
 
     internal static void MatrixMultiply(Index1D i, FAV r, FAV a, FAV b, int a0, int b0, float alpha, float beta, int transposeFlag)
     {
