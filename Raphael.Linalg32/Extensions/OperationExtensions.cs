@@ -111,9 +111,13 @@ public partial class Extensions
     
     public static RemoteTensor<T> Slice<T>(this LazuliteContext _, RemoteTensor<T> source, int start, int length, RemoteTensor<T>? r = null) where T : notnull => 
         Encase(source, r, (k, _r) => k.SliceKernel.Call(_r.IntLength, _r, source, start, length));
-    
-    public static RemoteTensor<T> OuterProduct<T>(this LazuliteContext _, RemoteTensor<T> a, RemoteTensor<T> b, int dimension, RemoteTensor<T>? r = null) where T : notnull => 
-        Encase(a, r, (k, _r) => k.OuterProductKernel.Call(_r.IntLength, _r, a, b, dimension));
+
+    public static RemoteTensor<float[,]> OuterProduct(this LazuliteContext ctx, RemoteTensor<float[]> a, RemoteTensor<float[]> b, RemoteTensor<float[,]>? r = null)
+    {
+        r ??= ctx.GetMatrix(a.IntLength, b.IntLength);
+        ctx.GetKernels().OuterProductKernel.Call(r.IntLength, r, a, b);
+        return r;
+    }
 
     public static RemoteTensor<float[,]> MatrixMultiply(this LazuliteContext _, RemoteTensor<float[,]> a, RemoteTensor<float[,]> b, int m, int n, float alpha = 1.0f, float beta = 0.0f,
         RemoteTensor<float[,]>? r = null, bool transposeA = false, bool transposeB = false, bool useCuBlas = true)
@@ -129,7 +133,7 @@ public partial class Extensions
         return Encase(a, r, (kernel, _r) => kernel.MatrixMultiplyKernel.Call(_r.IntLength, _r, a, b, m, n, alpha, beta, transposeFlag));
     }
     
-    public static RemoteTensor<float[]> MatrixVectorMultiply(this LazuliteContext ctx, RemoteTensor<float[,]> m, RemoteTensor<float> v, int m0, float alpha = 1.0f, float beta = 0.0f,
+    public static RemoteTensor<float[]> MatrixVectorMultiply(this LazuliteContext ctx, RemoteTensor<float[,]> m, RemoteTensor<float[]> v, int m0, float alpha = 1.0f, float beta = 0.0f,
         RemoteTensor<float[]>? r = null, bool transposeM = false, bool useCuBlas = true)
     {
         var m1 = m.IntLength / m0;
@@ -139,6 +143,12 @@ public partial class Extensions
     
     public static RemoteTensor<T> Transpose<T>(this LazuliteContext _, RemoteTensor<T> source, int dimension, RemoteTensor<T>? r = null) where T : notnull => 
         Encase(source, r, (k, _r) => k.TransposeKernel.Call(_r.IntLength, _r, source, dimension));
+
+    public static RemoteTensor<float[,]> BroadcastMatrixVectorAdd(this LazuliteContext _, RemoteTensor<float[,]> m, RemoteTensor<float[]> v, RemoteTensor<float[,]>? r = null) =>
+        Encase(m, r, (k, _r) => k.BroadcastMatrixVectorAddKernel.Call(m.IntLength, _r, m, v));
+
+    public static RemoteTensor<float[]> NarrowcastVectorMatrixAdd(this LazuliteContext _, RemoteTensor<float[]> v, RemoteTensor<float[,]> m, RemoteTensor<float[]>? r = null) =>
+        Encase(v, r, (k, _r) => k.NarrowcastVectorMatrixAdd.Call(v.IntLength, _r, v, m, m.Shape[0]));
     
     private static RemoteTensor<T> Encase<T>(RemoteTensor<T> inferFrom, RemoteTensor<T>? r, Action<Kernels, RemoteTensor<T>> action) where T : notnull
     {

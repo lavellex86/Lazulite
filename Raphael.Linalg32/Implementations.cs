@@ -1,4 +1,5 @@
-﻿using ILGPU;
+﻿using System.Diagnostics.CodeAnalysis;
+using ILGPU;
 using ILGPU.Algorithms;
 
 namespace Raphael.Linalg32;
@@ -52,7 +53,7 @@ internal partial class Implementations
 
     internal static void Negate(Index1D i, FAV r, FAV a) => r[i] = -a[i];
 
-    internal static void OuterProduct(Index1D i, FAV r, FAV a, FAV b, int n) => r[i] = a[i / n] * b[i % n];
+    internal static void OuterProduct(Index1D i, FAV r, FAV a, FAV b) => r[i] = a[i] * b[i];
 
     internal static void MatrixMultiply(Index1D i, FAV r, FAV a, FAV b, int a0, int b0, float alpha, float beta, int transposeFlag)
     {
@@ -88,4 +89,13 @@ internal partial class Implementations
         var (row, col) = (i / a0, i % a0);
         r[col * a1 + row] = m[row * a0 + col];
     }
+
+    internal static void BroadcastMatrixVectorAdd(Index1D i, FAV r, FAV m, FAV v) => r[i] += v[i % v.IntLength];
+
+    internal static void NarrowcastVectorMatrixAdd(Index1D i, FAV r, FAV v, FAV m, int m0)
+    {
+        var (sum, m1) = (0f, m.IntLength / m0);
+        for (int row = 0; row < m0; row++) sum += m[row * m1 + (int)i];
+        v[i] += sum;
+    } 
 }

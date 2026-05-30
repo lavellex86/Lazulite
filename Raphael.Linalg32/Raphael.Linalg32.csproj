@@ -10,10 +10,10 @@
     <PackageProjectUrl>https://github.com/raphael286/Lazulite</PackageProjectUrl>
     <RepositoryUrl>https://github.com/raphael286/Lazulite.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
-    <Version>2.0.2.3</Version>
+    <Version>2.0.2.7</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Removed AXPY, added matrix-vector multiply, AsVector, and AsMatrix</PackageReleaseNotes>
+    <PackageReleaseNotes>Narrowcast addition for matrix and vector</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
