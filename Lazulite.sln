@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.7.11919.86 stable
+VisualStudioVersion = 18.7.11919.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raphael.Lazulite", "Raphael.Lazulite\Raphael.Lazulite.csproj", "{3AE8A7DE-812A-4119-B5EE-89527B06F75B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing", "Testing\Testing.csproj", "{4B764587-2C99-41B0-99A8-94CEA9BCCF23}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinalgTesting", "Testing\LinalgTesting.csproj", "{4B764587-2C99-41B0-99A8-94CEA9BCCF23}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raphael.Linalg32", "Raphael.Linalg32\Raphael.Linalg32.csproj", "{735AD6B0-342F-4A2F-901B-002C23097218}"
 EndProject

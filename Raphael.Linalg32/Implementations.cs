@@ -9,10 +9,7 @@ internal partial class Implementations
     internal static void Fill(Index1D i, FAV r, float n) => r[i] = n;
     internal static void Concat(Index1D i, FAV r, FAV a, FAV b) => r[i] = i < a.Length ? a[i] : b[i - a.Length];
 
-    internal static void Slice(Index1D i, FAV r, FAV v, int start, int end)
-    {
-        if (i >= start && i < end) r[i - start] = v[i];
-    }
+    internal static void Slice(Index1D i, FAV r, FAV v, int start) => r[i] = v[i + start];
 
     internal static void Add(Index1D i, FAV r, FAV a, FAV b) => r[i] = a[i] + b[i];
     internal static void Subtract(Index1D i, FAV r, FAV a, FAV b) => r[i] = a[i] - b[i];
@@ -53,7 +50,12 @@ internal partial class Implementations
 
     internal static void Negate(Index1D i, FAV r, FAV a) => r[i] = -a[i];
 
-    internal static void OuterProduct(Index1D i, FAV r, FAV a, FAV b) => r[i] = a[i] * b[i];
+    internal static void OuterProduct(Index1D i, FAV r, FAV a, FAV b)
+    {
+        var row = i / (int)b.Length;
+        var col = i % (int)b.Length;
+        r[i] = a[row] * b[col];
+    }
 
     internal static void MatrixMultiply(Index1D i, FAV r, FAV a, FAV b, int a0, int b0, float alpha, float beta, int transposeFlag)
     {

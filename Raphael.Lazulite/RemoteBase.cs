@@ -39,7 +39,7 @@ public abstract class RemoteBase<TElement, THost>(MemoryBuffer1D<TElement, Strid
     {
         if (NotDisposable) return;
         _disposeHook?.Invoke();
-        Pool.Return();
+        Pool.Return(Buffer);
         Disposed = true;
     }
 

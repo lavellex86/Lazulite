@@ -18,8 +18,7 @@ public class LazuliteContext : IDisposable
             .EnableAlgorithms()
             .Optimize(optimization));
         Accelerator = accelerator ?? _ctx.Devices
-            .Where(d => d is not CPUDevice || !gpu)
-            .Where(d => d is CPUDevice || gpu)
+            .Where(d => gpu ? d is not CPUDevice : d is CPUDevice)
             .OrderBy(RankDevice)
             .First().CreateAccelerator(_ctx);
     }

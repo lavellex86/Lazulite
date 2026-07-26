@@ -5,14 +5,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageId>Raphael.Cac32</PackageId>
+    <PackageId>Raphael.Calc32</PackageId>
     <Title>Raphael.Calc32</Title>
-    <Version>2.0.2.1</Version>
+    <Version>2.1.1.1</Version>
     <Authors>Raphael</Authors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Raphael.Linalg32" Version="2.0.2.9" />
+    <PackageReference Include="Raphael.Linalg32" Version="2.1.1" />
   </ItemGroup>
 
 </Project>

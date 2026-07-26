@@ -16,7 +16,6 @@ public abstract class RemoteTensor<T>(FMB buffer, BufferPool<float> pool, int[] 
 
     public override RemoteTensor<T> Set(T host)
     {
-        Context.Synchronize();
         Buffer.CopyFromCPU(ConvertToRaw(host));
         return this;
     }
@@ -52,8 +51,8 @@ public class RemoteVector(FMB buffer, BufferPool<float> pool) : RemoteTensor<flo
         {
             var matrix = new float[Shape[0], Shape[1]];
             for (int i = 0; i < Shape[0]; i++)
-            for (int j = 0; i < Shape[1]; i++)
-                matrix[i, j] = raw[i * Shape[0] + j];
+            for (int j = 0; j < Shape[1]; i++)
+                matrix[i, j] = raw[i * Shape[1] + j];
             return matrix;
         }
 
@@ -61,8 +60,8 @@ public class RemoteVector(FMB buffer, BufferPool<float> pool) : RemoteTensor<flo
         {
             var raw = new float[host.GetLength(0) * host.GetLength(1)];
             for (int i = 0; i < Shape[0]; i++)
-            for (int j = 0; i < Shape[1]; i++)
-                raw[i * Shape[0] + j] = host[i, j];
+            for (int j = 0; j < Shape[1]; i++)
+                raw[i * Shape[1] + j] = host[i, j];
             return raw;
         }
 

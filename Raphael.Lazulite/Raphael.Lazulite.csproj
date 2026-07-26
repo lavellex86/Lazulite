@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>2.0.2</Version>
+    <Version>2.1</Version>
     <Title>Lazulite</Title>
     <Authors>raphael286</Authors>
     <Description>Fast &amp; powerful GPU acceleration for C#.</Description>
@@ -13,7 +13,7 @@
     <RepositoryType>Git</RepositoryType>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Just some quick additions regarding IRemoteBase</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed a few things</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

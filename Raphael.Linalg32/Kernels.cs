@@ -8,7 +8,7 @@ internal class Kernels(LazuliteContext lctx)
 {
     internal readonly LazuliteKernel<Action<Index1D, FAV, float>> FillKernel = new(Implementations.Fill, lctx);
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV>> ConcatKernel = new(Implementations.Concat, lctx);
-    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, int, int>> SliceKernel = new(Implementations.Slice, lctx);
+    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, int>> SliceKernel = new(Implementations.Slice, lctx);
 
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV>> AddKernel = new(Implementations.Add, lctx);
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV>> SubtractKernel = new(Implementations.Subtract, lctx);
