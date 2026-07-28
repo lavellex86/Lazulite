@@ -10,16 +10,17 @@
     <PackageProjectUrl>https://github.com/raphael286/Lazulite</PackageProjectUrl>
     <RepositoryUrl>https://github.com/raphael286/Lazulite.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Version>2.1.1</Version>
+    <Version>2.2.0</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Fixed some important bugs</PackageReleaseNotes>
+	 <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageReleaseNotes>Overhaul, bug fixes, and docs</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ILGPU" Version="1.5.3" />
     <PackageReference Include="ILGPU.Algorithms" Version="1.5.3" />
-    <PackageReference Include="Raphael.Lazulite" Version="2.1.0" />
+    <PackageReference Include="Raphael.Lazulite" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

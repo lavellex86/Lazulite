@@ -68,9 +68,7 @@ internal partial class Implementations
         if (transposeFlag == 0) (k, n) = (a1, b1); // no transpose
         else if (transposeFlag == 1) (k, n) = (a0, b1); // transpose A
         else if (transposeFlag == 2) (k, n) = (a1, b0); // transpose B
-        else if (transposeFlag == 3) (k, n) = (a0, b0); // transpose both
-        else throw new Exception("MatrixMultiply got an invalid 'transposeFlag.'");
-
+        else (k, n) = (a0, b0); // transpose both
         var (row, col) = (i / n, i % n);
 
         var sum = 0f;
