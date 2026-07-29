@@ -9,3 +9,4 @@
 
 * [Home](lazulite-api-reference/home.md)
 * [RemoteBase](lazulite-api-reference/remotebase.md)
+* [BufferPool](lazulite-api-reference/bufferpool.md)
