@@ -2,7 +2,7 @@
 
 ## Lazulite Documentation
 
-* [Remotes](README.md)
+* [Home](README.md)
 * [The Basics](lazulite-documentation/the-basics.md)
 
 ## Lazulite API Reference

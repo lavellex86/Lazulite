@@ -1,3 +1,4 @@
-# Remotes
+# Home
 
-Remotes are... finish later.
+Home is... finish later.
+
