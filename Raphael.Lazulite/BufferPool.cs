@@ -7,7 +7,7 @@ namespace Raphael.Lazulite;
 /// A pool of reusable buffers.
 /// </summary>
 /// <typeparam name="T">The buffer type to keep</typeparam>
-/// <param name="lctx">The Lazulite context object currently in use.</param>
+/// <param name="lctx">The Lazulite context over the pool.</param>
 public class BufferPool<T>(LazuliteContext lctx) : IDisposable where T : unmanaged
 {
     private readonly Dictionary<long, Stack<MemoryBuffer1D<T, Stride1D.Dense>>> _pool = [];

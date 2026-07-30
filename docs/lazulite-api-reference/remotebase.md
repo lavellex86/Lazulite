@@ -8,6 +8,14 @@ Represents an object on the compute device.
 - `THost`: The class represented by the remote.
 
 ---
+## Constructor
+```csharp
+public RemoteBase<TElement, THost>(
+    MemoryBuffer1D<TElement, Stride1D.Dense> buffer, 
+    BufferPool<TElement> pool)
+```
+- `buffer`: The memory buffer of `TElement`s that holds the remote object.
+- `pool`: The buffer pool this object belongs to.
 
 ## Properties
 
