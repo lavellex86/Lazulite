@@ -50,11 +50,11 @@ internal partial class Implementations
 
     internal static void Negate(Index1D i, FAV r, FAV a) => r[i] = -a[i];
 
-    internal static void OuterProduct(Index1D i, FAV r, FAV a, FAV b)
+    public static void OuterProduct(Index1D index, FAV r, FAV a, FAV b, float alpha, float beta)
     {
-        var row = i / (int)b.Length;
-        var col = i % (int)b.Length;
-        r[i] = a[row] * b[col];
+        var j = index % b.IntLength;
+        var i = index / b.IntLength;
+        r[index] = alpha * a[i] * b[j] + beta * r[index];
     }
 
     internal static void MatrixMultiply(Index1D i, FAV r, FAV a, FAV b, int a0, int b0, float alpha, float beta, int transposeFlag)
@@ -92,10 +92,13 @@ internal partial class Implementations
 
     internal static void BroadcastMatrixVectorAdd(Index1D i, FAV r, FAV m, FAV v) => r[i] += v[i % v.IntLength];
 
-    internal static void NarrowcastVectorMatrixAdd(Index1D i, FAV r, FAV v, FAV m, int m0)
+    internal static void NarrowcastVectorMatrixAdd(Index1D i, FAV r, FAV m, int m0)
     {
         var (sum, m1) = (0f, m.IntLength / m0);
         for (int row = 0; row < m0; row++) sum += m[row * m1 + (int)i];
-        v[i] += sum;
-    } 
+        r[i] += sum;
+    }
+
+    internal static void Dot(Index1D i, FAV r, FAV a, FAV b) => Atomic.Add(ref r[0], a[i] * b[i]);
+    internal static void Axpy(Index1D i, FAV r, FAV a, FAV b, float alpha) => r[i] = alpha * a[i] + b[i];
 }

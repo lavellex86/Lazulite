@@ -51,10 +51,13 @@ internal class Kernels(LazuliteContext lctx)
 
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV>> NegateKernel = new(Implementations.Negate, lctx);
     
-    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV>> OuterProductKernel = new(Implementations.OuterProduct, lctx);
+    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV, float, float>> OuterProductKernel = new(Implementations.OuterProduct, lctx);
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV, int, int, float, float, int>> MatrixMultiplyKernel = new(Implementations.MatrixMultiply, lctx);
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, int>> TransposeKernel = new(Implementations.Transpose, lctx);
 
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV>> BroadcastMatrixVectorAddKernel = new(Implementations.BroadcastMatrixVectorAdd, lctx);
-    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV, int>> NarrowcastVectorMatrixAdd = new(Implementations.NarrowcastVectorMatrixAdd, lctx);
+    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, int>> NarrowcastVectorMatrixAdd = new(Implementations.NarrowcastVectorMatrixAdd, lctx);
+
+    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV>> DotKernel = new(Implementations.Dot, lctx);
+    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV, float>> AxpyKernel = new(Implementations.Axpy, lctx);
 }

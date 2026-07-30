@@ -1,9 +1,12 @@
-﻿using Raphael.Lazulite;
+﻿using ILGPU.Runtime.Cuda;
+using Raphael.Lazulite;
+using System.Runtime.CompilerServices;
 
 namespace Raphael.Linalg32;
 
 public partial class LinalgExtensions
 {
+    #region Simple Elementwise
     /// <summary>
     /// Adds two tensors elementwise.
     /// </summary>
@@ -42,9 +45,17 @@ public partial class LinalgExtensions
 
     /// <summary>
     /// Multiplies every element of a tensor by a scalar value.
+    /// If <paramref name="useCuBlas"/> is enabled and <paramref name="r"/> is <paramref name="a"/>, the CuBLAS version will be used.
     /// </summary>
-    public static RemoteTensor<T> MultiplyScalar<T>(this LazuliteContext _, RemoteTensor<T> a, float scalar, RemoteTensor<T>? r = null) where T : notnull =>
-        Encase(a, r, (k, _r) => k.MultiplyScalarKernel.Call(_r.Length, _r, a, scalar));
+    public static RemoteTensor<T> MultiplyScalar<T>(this LazuliteContext lctx, RemoteTensor<T> a, float scalar, RemoteTensor<T>? r = null, bool useCuBlas = true) where T : notnull
+    {
+        if (useCuBlas && r == a)
+        {
+            lctx.GetCuBlas().Scal(scalar, a.Buffer.View.AsGeneral());
+            return a;
+        } 
+        return Encase(a, r, (k, _r) => k.MultiplyScalarKernel.Call(_r.Length, _r, a, scalar));
+    }
 
     /// <summary>
     /// Divides every element of a tensor by a scalar value.
@@ -204,6 +215,21 @@ public partial class LinalgExtensions
         lctx.GetKernels().FillKernel.Call(tensor.Length, tensor, value);
         return tensor;
     }
+    /// <summary>
+    /// <c>r = alpha * x + y</c>. 
+    /// If <paramref name="useCuBlas"/> is enabled, the result is <c>y += alpha * x</c>, so non-null <paramref name="r"/> defaults to the non-CuBLAS version.
+    /// </summary>
+    public static RemoteTensor<T> Axpy<T>(this LazuliteContext lctx, RemoteTensor<T> x, RemoteTensor<T> y, float alpha, RemoteTensor<T>? r = null, bool useCuBlas = true) where T : notnull
+    {
+        if (useCuBlas && r is null)
+        {
+            lctx.GetCuBlas().Axpy(alpha, x.Buffer.View.AsGeneral(), y.Buffer.View.AsGeneral());
+            return y;
+        }
+        return Encase(x, r, (k, _r) => k.AxpyKernel.Call(_r.Length, _r, x, y, alpha));
+    }
+
+    #endregion
 
     /// <summary>
     /// Concatenates two vectors.
@@ -225,13 +251,20 @@ public partial class LinalgExtensions
         return r;
     }
 
+    #region Tensor Operations
     /// <summary>
-    /// Computes the outer product of two vectors, producing a matrix of shape [a.Length, b.Length].
+    /// Computes the outer product of two vectors, producing a matrix of shape [a.Length, b.Length] 
+    /// multiplied by <paramref name="alpha"/> and accumulating into <paramref name="r"/> scaled by <paramref name="beta"/>.
     /// </summary>
-    public static RemoteTensor<float[,]> OuterProduct(this LazuliteContext ctx, RemoteTensor<float[]> a, RemoteTensor<float[]> b, RemoteTensor<float[,]>? r = null)
+    public static RemoteTensor<float[,]> OuterProduct(this LazuliteContext ctx, RemoteTensor<float[]> a, RemoteTensor<float[]> b, RemoteTensor<float[,]>? r = null, float alpha = 1f, float beta = 0f, bool useCuBlas = true)
     {
-        r ??= ctx.GetMatrix(a.Length, b.Length);
-        ctx.GetKernels().OuterProductKernel.Call(r.Length, r, a, b);
+        r ??= ctx.GetMatrix(a.Length, b.Length, true);
+        if (useCuBlas && beta == 0f)
+        {
+            ctx.GetCuBlas().Ger(a.Length, b.Length, alpha, a.Buffer.View.AsGeneral(), b.Buffer.View.AsGeneral(), r.Buffer.View, a.Length);
+            return r;
+        }
+        ctx.GetKernels().OuterProductKernel.Call(r.Length, r, a, b, alpha, beta);
         return r;
     }
 
@@ -241,12 +274,30 @@ public partial class LinalgExtensions
     /// </summary>
     public static RemoteTensor<float[,]> MatrixMultiply(this LazuliteContext ctx, RemoteTensor<float[,]> a, RemoteTensor<float[,]> b,
         float alpha = 1.0f, float beta = 0.0f, RemoteTensor<float[,]>? r = null,
-        bool transposeA = false, bool transposeB = false, bool useCuBlas = false)
+        bool transposeA = false, bool transposeB = false, bool useCuBlas = true)
     {
         var aRows = transposeA ? a.Shape[1] : a.Shape[0];
         var aCols = transposeA ? a.Shape[0] : a.Shape[1];
         var bCols = transposeB ? b.Shape[0] : b.Shape[1];
-        r ??= ctx.GetMatrix(aRows, bCols);
+        r ??= ctx.GetMatrix(aRows, bCols, true);
+
+        if (useCuBlas)
+        {
+            var opA = transposeA ? CuBlasOperation.Transpose : CuBlasOperation.NonTranspose;
+            var opB = transposeB ? CuBlasOperation.Transpose : CuBlasOperation.NonTranspose;
+
+            ctx.GetCuBlas().Gemm(
+                opB, opA,
+                bCols, aRows, aCols,
+                alpha,
+                b.Buffer.View.AsContiguous(), b.Shape[1],
+                a.Buffer.View.AsContiguous(), a.Shape[1],
+                beta,
+                r.Buffer.View.AsContiguous(), bCols);
+
+            return r;
+        }
+
         var a0 = a.Shape[0];
         var b0 = b.Shape[0];
         var transposeFlag = (transposeA, transposeB) switch
@@ -269,6 +320,21 @@ public partial class LinalgExtensions
     {
         var m1 = m.Length / m0;
         r ??= ctx.GetVector(transposeM ? m0 : m1);
+        if (useCuBlas)
+        {
+            var op = transposeM ? CuBlasOperation.NonTranspose : CuBlasOperation.Transpose;
+
+            ctx.GetCuBlas().Gemv(
+                op,
+                m1, m0,
+                alpha,
+                m.Buffer.View.AsContiguous(), m1,
+                v.Buffer.View.AsGeneral(),
+                beta,
+                r.Buffer.View.AsGeneral());
+
+            return r;
+        }
         return ctx.MatrixMultiply(m, v.AsMatrix(), alpha, beta, r.AsMatrix(), transposeM, false, useCuBlas).AsVector();
     }
 
@@ -289,10 +355,28 @@ public partial class LinalgExtensions
         Encase(m, r, (k, _r) => k.BroadcastMatrixVectorAddKernel.Call(m.Length, _r, m, v));
 
     /// <summary>
-    /// Reduces a matrix into a vector by summing each column across rows, then adds the result to <paramref name="v"/>.
+    /// Reduces a matrix into a vector by summing each column across rows, then adds the result to <paramref name="r"/>.
     /// </summary>
-    public static RemoteTensor<float[]> NarrowcastVectorMatrixAdd(this LazuliteContext _, RemoteTensor<float[]> v, RemoteTensor<float[,]> m, RemoteTensor<float[]>? r = null) =>
-        Encase(v, r, (k, _r) => k.NarrowcastVectorMatrixAdd.Call(v.Length, _r, v, m, m.Shape[0]));
+    public static RemoteTensor<float[]> NarrowcastVectorMatrixAdd(this LazuliteContext _, RemoteTensor<float[,]> m, RemoteTensor<float[]> r) =>
+        Encase(r, r, (k, _r) => k.NarrowcastVectorMatrixAdd.Call(r.Length, _r, m, m.Shape[0]));
+
+    /// <summary>
+    /// Takes the dot product of two vectors.
+    /// </summary>
+    public static RemoteTensor<float> Dot(this LazuliteContext lctx, RemoteTensor<float[]> a, RemoteTensor<float[]> b, RemoteTensor<float>? r = null, bool useCuBlas = true)
+    {
+        r ??= lctx.GetScalar(true);
+        if (useCuBlas)
+        {
+            lctx.GetCuBlas().Dot(a.Buffer.View.AsGeneral(), b.Buffer.View.AsGeneral(), r.Buffer.View.AsContiguous());
+            return r;
+        }
+        lctx.GetKernels().DotKernel.Call(a.Length, r, a, b);
+        return r;
+    }
+    #endregion
+
+    
 
     private static RemoteTensor<T> Encase<T>(RemoteTensor<T> inferFrom, RemoteTensor<T>? r, Action<Kernels, RemoteTensor<T>> action) where T : notnull
     {

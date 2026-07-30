@@ -8,22 +8,22 @@ namespace Raphael.Lazulite;
 /// </summary>
 /// <typeparam name="TElement">The unmanaged data type stored on the compute device.</typeparam>
 /// <typeparam name="THost">The class represented by the remote.</typeparam>
-/// <param name="buffer">The memory buffer of <typeparamref name="TElement"/>s that hold the remote object.</param>
-/// <param name="pool">The buffer pool this object belongs too.</param>
+/// <param name="buffer">The memory buffer of <typeparamref name="TElement"/>s that holds the remote object.</param>
+/// <param name="pool">The buffer pool this object belongs to.</param>
 public abstract class RemoteBase<TElement, THost>(MemoryBuffer1D<TElement, Stride1D.Dense> buffer, BufferPool<TElement> pool) : IDisposable
     where TElement : unmanaged 
     where THost : notnull
 {
     /// <summary>
-    /// The memory buffer of <typeparamref name="TElement"/>s that hold the remote object
+    /// The memory buffer of <typeparamref name="TElement"/>s that holds the remote object.
     /// </summary>
     public MemoryBuffer1D<TElement, Stride1D.Dense> Buffer { get; } = buffer;
     /// <summary>
-    /// Whether this object is disposable. When true, it will be disposed of or returned to the pool.
+    /// Whether this object is disposable. When true, it will be returned to the pool on <see cref="Dispose"/>.
     /// </summary>
     public bool Disposable { get; set; } = true;
     /// <summary>
-    /// Whether this object has been disposed of.
+    /// Whether this remote has been disposed of.
     /// </summary>
     public bool Disposed { get; private set; } = false;
 
@@ -33,11 +33,11 @@ public abstract class RemoteBase<TElement, THost>(MemoryBuffer1D<TElement, Strid
     public int Length { get; } = buffer.IntExtent;
 
     /// <summary>
-    /// The buffer pool this object belongs too.
+    /// The buffer pool this object belongs to.
     /// </summary>
     public BufferPool<TElement> Pool { get; } = pool;
     /// <summary>
-    /// The Lazulite context this object is under.
+    /// The Lazulite context over this remote..
     /// </summary>
     public LazuliteContext Context => Pool._lctx;
     /// <summary>

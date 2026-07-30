@@ -44,6 +44,8 @@ public static partial class LinalgExtensions
     {
         if (!_pools.ContainsKey(lctx)) _pools[lctx] = new(lctx);
         if (!_kernels.ContainsKey(lctx)) _kernels[lctx] = new(lctx);
+        try { if (!_cuBlasDict.ContainsKey(lctx)) _cuBlasDict[lctx] = new((CudaAccelerator)lctx.Accelerator); }
+        catch { }
         return lctx;
     }
 
@@ -55,6 +57,10 @@ public static partial class LinalgExtensions
     /// Interprets this vector as a matrix.
     /// </summary>
     public static RemoteMatrix AsMatrix(this RemoteTensor<float[]> tensor)  => new(tensor.Buffer, tensor.Pool, tensor.Length);
+    /// <summary>
+    /// Interprets this <see cref="RemoteTensor{T}"/> matrix as a <see cref="RemoteMatrix"/> matrix.
+    /// </summary>
+    public static RemoteMatrix AsMatrix(this RemoteTensor<float[,]> tensor) => new(tensor.Buffer, tensor.Pool, tensor.Shape[0]);
 
     /// <summary>
     /// Casts a <see cref="RemoteTensor{T}"/> back to a <see cref="RemoteScalar"/>.
