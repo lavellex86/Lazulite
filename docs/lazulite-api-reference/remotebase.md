@@ -17,6 +17,7 @@ public RemoteBase<TElement, THost>(
 - `buffer`: The memory buffer of `TElement`s that holds the remote object.
 - `pool`: The buffer pool this object belongs to.
 
+---
 ## Properties
 
 ```csharp
