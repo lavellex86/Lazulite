@@ -39,7 +39,7 @@ using var blue = new RemoteColor(pool.Get(4), pool) // create the remote
 We can copy the `red` into another remote with `.Set` as well:
 
 {% code overflow="wrap" %}
-```
+```csharp
 using var redCopy = new RemoteColor(pool.Get(4), pool)
     .Set(red.Buffer); // copies from red on the compute device
 ```
@@ -48,9 +48,13 @@ using var redCopy = new RemoteColor(pool.Get(4), pool)
 and take the copy's length and dispose status:
 
 {% code overflow="wrap" %}
-```
+```csharp
 Console.WriteLine($"{redCopy.Length}, {redCopy.Disposed}, {redCopy.Disposable}");
 ```
 {% endcode %}
 
 If a remote is flagged non-disposable, calls to `.Dispose` will be ignored, meaning the buffer will not be returned to the pool.
+
+{% hint style="info" %}
+You can view the full script for this page [here](https://github.com/raphael286/Lazulite/blob/main/Tests/DocsExample/Program.cs).
+{% endhint %}

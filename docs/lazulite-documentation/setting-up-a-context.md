@@ -54,3 +54,6 @@ Console.WriteLine(lctx.Accelerator.AcceleratorType);
 ```
 {% endcode %}
 
+{% hint style="info" %}
+You can view the full script for this page [here](https://github.com/raphael286/Lazulite/blob/main/Tests/DocsExample/Program.cs).
+{% endhint %}

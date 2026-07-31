@@ -68,5 +68,5 @@ Console.WriteLine($"[{returned[0]}, {returned[1]}, {returned[2]}]");
 {% endcode %}
 
 {% hint style="info" %}
-You can view the full code for this example [here](https://github.com/raphael286/Lazulite/blob/main/Tests/DocsExample/Program.cs).
+You can view the full script for this page [here](https://github.com/raphael286/Lazulite/blob/main/Tests/DocsExample/Program.cs).
 {% endhint %}
