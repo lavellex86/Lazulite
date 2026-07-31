@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raphael.Calc32", "Raphael.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinalgBenchmarks", "Tests\LinalgBenchmarks\LinalgBenchmarks.csproj", "{69D7A8BE-4A14-04F6-06D0-D040F5DCD5F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocsExample", "Tests\DocsExample\DocsExample.csproj", "{AF583FBF-AD20-6560-B0C4-D74D6CD7C5FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{69D7A8BE-4A14-04F6-06D0-D040F5DCD5F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69D7A8BE-4A14-04F6-06D0-D040F5DCD5F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69D7A8BE-4A14-04F6-06D0-D040F5DCD5F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF583FBF-AD20-6560-B0C4-D74D6CD7C5FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF583FBF-AD20-6560-B0C4-D74D6CD7C5FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF583FBF-AD20-6560-B0C4-D74D6CD7C5FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF583FBF-AD20-6560-B0C4-D74D6CD7C5FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
