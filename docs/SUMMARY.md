@@ -4,6 +4,8 @@
 
 * [Home](README.md)
 * [The Basics](lazulite-documentation/the-basics.md)
+* [Setting Up a Context](lazulite-documentation/setting-up-a-context.md)
+* [Remotes](lazulite-documentation/remotes.md)
 
 ## Lazulite API Reference
 
