@@ -2,10 +2,10 @@
 using ILGPU.Runtime;
 using Raphael.Lazulite;
 
-var lctx = new LazuliteContext(); 
-var pool = new BufferPool<int>(lctx);
+using var lctx = new LazuliteContext(); 
+using var pool = new BufferPool<int>(lctx);
 
-var remote = new RemoteIntArray(pool.Get(3), pool) 
+using var remote = new RemoteIntArray(pool.Get(3), pool) 
     .Set([1, 2, 3]);
 
 var kernel = new LazuliteKernel<Action<Index1D, ArrayView1D<int, Stride1D.Dense>>>((i, arr) => arr[i] += 1, lctx);
