@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using ILGPU;
-using ILGPU.Runtime;
-using Raphael.Lazulite;
+﻿using Raphael.Lazulite;
 
 namespace Raphael.Linalg32;
 
@@ -27,15 +24,16 @@ public abstract class RemoteTensor<T>(FMB buffer, BufferPool<float> pool, int[] 
     /// <summary>
     /// Creates a new <see cref="RemoteTensor{T}"/> object from a pool and shape.
     /// </summary>
-    public RemoteTensor<T> Create(int[] shape, BufferPool<float> pool) => Create(pool.Get(shape.Aggregate((a, b) => a * b)), pool, shape);
+    public RemoteTensor<T> Create(int[] shape, BufferPool<float> pool, bool cleared = false) => 
+        Create(pool.Get(shape.Aggregate((a, b) => a * b), cleared), pool, shape);
     /// <summary>
     /// Creates a new <see cref="RemoteTensor{T}"/> object from a shape.
     /// </summary>
-    public RemoteTensor<T> Create(int[] shape) => Create(shape, Pool);
+    public RemoteTensor<T> Create(int[] shape, bool cleared = false) => Create(shape, Pool, cleared);
     /// <summary>
     /// Creates a new <see cref="RemoteTensor{T}"/> object.
     /// </summary>
-    public RemoteTensor<T> Create() => Create(Shape);
+    public RemoteTensor<T> Create(bool cleared = false) => Create(Shape, false);
 
     /// <summary>
     /// Converts the tensor to an ILGPU array view object.

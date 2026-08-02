@@ -10,11 +10,11 @@
     <PackageProjectUrl>https://github.com/raphael286/Lazulite</PackageProjectUrl>
     <RepositoryUrl>https://github.com/raphael286/Lazulite.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Version>2.2.2</Version>
+    <Version>2.2.4</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	 <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <PackageReleaseNotes>Inverse, dot, and some more operations</PackageReleaseNotes>
+    <PackageReleaseNotes>Some more naturally CPU methods</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

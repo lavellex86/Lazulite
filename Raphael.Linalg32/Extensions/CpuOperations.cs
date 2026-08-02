@@ -11,7 +11,7 @@ namespace Raphael.Linalg32
     public static partial class LinalgExtensions
     {
         /// <summary>
-        /// Inverts the matrix <paramref name="matrix"/> on the CPU (syncing and transferring it from the compute device).
+        /// Inverts a square matrix on the CPU (syncing and transferring it from the compute device).
         /// </summary>
         public static RemoteTensor<float[,]> CpuInvert(this LazuliteContext lctx, RemoteTensor<float[,]> matrix)
         {
@@ -60,6 +60,40 @@ namespace Raphael.Linalg32
             }
 
             return (RemoteMatrix)lctx.GetMatrix(n, n).Set(inv);
+        }
+
+        /// <summary>
+        /// Takes the L1 norm of a vector (sum of absolutes) on the CPU (syncing and transferring it from the compute device).
+        /// </summary>
+        public static float CpuL1Norm(this LazuliteContext lctx, RemoteTensor<float[]> vector)
+        {
+            var v = vector.Get();
+            var sum = 0f;
+            for (int i = 0; i < v.Length; i++) sum += MathF.Abs(v[i]);
+            return sum;
+        }
+
+        /// <summary>
+        /// Takes the L2 norm of a vector (sum of squares) on the CPU (syncing and transferring it from the compute device).
+        /// </summary>
+        public static float CpuL2Norm(this LazuliteContext lctx, RemoteTensor<float[]> vector)
+        {
+            var v = vector.Get();
+            var sum = 0f;
+            for (int i = 0; i < v.Length; i++) sum += v[i] * v[i];
+            return MathF.Sqrt(sum);
+        }
+
+        /// <summary>
+        /// Takes the sum of a vector on the CPU (syncing and transferring it from the compute device).
+        /// </summary>
+        public static float CpuSum(this LazuliteContext lctx, RemoteTensor<float[]> vector)
+        {
+            var v = vector.Get();
+            float sum = 0f;
+            for (int i = 0; i < v.Length; i++)
+                sum += v[i];
+            return sum;
         }
     }
 }
