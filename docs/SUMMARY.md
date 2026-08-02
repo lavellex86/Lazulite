@@ -14,3 +14,10 @@
 * [BufferPool](lazulite-api-reference/bufferpool.md)
 * [LazuliteContext](lazulite-api-reference/lazulitecontext.md)
 * [LazuliteKernel](lazulite-api-reference/lazulitekernel.md)
+
+## Linalg32 API Reference
+
+***
+
+* [Home](home.md)
+* [RemoteTensor](remotetensor.md)
