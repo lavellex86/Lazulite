@@ -20,4 +20,7 @@
 ***
 
 * [Home](home.md)
-* [RemoteTensor](remotetensor.md)
+* [RemoteTensor](remotetensor/README.md)
+  * [RemoteScalar](remotetensor/remotescalar.md)
+  * [RemoteVector](remotetensor/remotevector.md)
+  * [RemoteMatrix](remotetensor/remotematrix.md)
