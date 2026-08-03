@@ -12,7 +12,7 @@ To begin, let's start with a simple remote type; a color remote:
 ```csharp
 using ILGPU;
 using ILGPU.Runtime;
-using Raphael.Lazulite;
+using Lavelle.Lazulite;
 using System.Drawing;
 
 public class RemoteColor(MemoryBuffer1D<byte, Stride1D.Dense> buffer, BufferPool<byte> pool) : RemoteBase<byte, Color>(buffer, pool) // we'll store 4 0-255 range elements, to make up ARGB in bytes on the compute device
@@ -56,5 +56,5 @@ Console.WriteLine($"{redCopy.Length}, {redCopy.Disposed}, {redCopy.Disposable}")
 If a remote is flagged non-disposable, calls to `.Dispose` will be ignored, meaning the buffer will not be returned to the pool.
 
 {% hint style="info" %}
-You can view the full script for this page [here](https://github.com/raphael286/Lazulite/blob/main/Tests/DocsExample/Program.cs).
+You can view the full script for this page [here](https://github.com/lavellex86/Lazulite/blob/main/Tests/DocsExample/Program.cs).
 {% endhint %}

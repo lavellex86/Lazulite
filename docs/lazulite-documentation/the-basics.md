@@ -6,7 +6,7 @@ These docs are for readers familiar with the basics of GPU computing. For those 
 
 Lazulite operates on the idea of remotes, objects stored on a compute device like the GPU instead of the runtime device, the CPU. Remote types implement the abstract class `RemoteBase<TElement, THost>` , which represents a `THost` type object made up of `TElement`s underneath.
 
-The underlying buffer of `TElements` will belong to a buffer pool, which allows compute device memory to be reused on remote disposal.&#x20;
+The underlying buffer of `TElements` will belong to a buffer pool, which allows compute device memory to be reused on remote disposal.
 
 A simple remote looks like this:
 
@@ -14,7 +14,7 @@ A simple remote looks like this:
 ```csharp
 using ILGPU;
 using ILGPU.Runtime;
-using Raphael.Lazulite;
+using Lavelle.Lazulite;
 
 // a remote array of integers, we'll take the ILGPU memory buffer and the pool in the constructor
 class RemoteIntArray(MemoryBuffer1D<int, Stride1D.Dense> buffer, BufferPool<int> pool) 
@@ -68,5 +68,5 @@ Console.WriteLine($"[{returned[0]}, {returned[1]}, {returned[2]}]");
 {% endcode %}
 
 {% hint style="info" %}
-You can view the full script for this page [here](https://github.com/raphael286/Lazulite/blob/main/Tests/DocsExample/Program.cs).
+You can view the full script for this page [here](https://github.com/lavellex86/Lazulite/blob/main/Tests/DocsExample/Program.cs).
 {% endhint %}

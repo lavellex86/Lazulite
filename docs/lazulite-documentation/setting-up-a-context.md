@@ -9,7 +9,7 @@ The `LazuliteContext` object is very important to set up correctly. On this page
 The constructor for `LazuliteContext` includes two options we haven't used yet; a `gpu` boolean, which sets whether the initializer will look for a CPU or GPU compute device, and the `optimization` enum, which determines how fast kernels are after compilation.
 
 <pre class="language-csharp" data-overflow="wrap"><code class="lang-csharp">using ILGPU;
-using Raphael.Lazulite;
+using Lavelle.Lazulite;
 
 using var lctx1 = new LazuliteContext(gpu: true, optimization: OptimizationLevel.Debug); // uses GPU, debug optimization; fast compliation, slower kernels
 using var lctx2 = new LazuliteContext(false, OptimizationLevel.O0); // uses CPU, optimization level 0
@@ -22,7 +22,7 @@ If you're using any extension libraries for Lazulite, this is where you would in
 
 {% code overflow="wrap" %}
 ```csharp
-using Raphael.Linalg32;
+using Lavelle.Linalg32;
 
 using var lctx = new LazuliteContext()
     .EnableLinalg32()
@@ -55,5 +55,5 @@ Console.WriteLine(lctx.Accelerator.AcceleratorType);
 {% endcode %}
 
 {% hint style="info" %}
-You can view the full script for this page [here](https://github.com/raphael286/Lazulite/blob/main/Tests/DocsExample/Program.cs).
+You can view the full script for this page [here](https://github.com/lavellex86/Lazulite/blob/main/Tests/DocsExample/Program.cs).
 {% endhint %}
