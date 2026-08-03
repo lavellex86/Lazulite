@@ -17,8 +17,6 @@
 
 ## Linalg32 API Reference
 
-***
-
 * [Home](linalg32-api-reference/home.md)
 * [RemoteTensor](linalg32-api-reference/remotetensor/README.md)
   * [RemoteScalar](linalg32-api-reference/remotetensor/remotescalar.md)
