@@ -19,8 +19,8 @@
 
 ***
 
-* [Home](home.md)
-* [RemoteTensor](remotetensor/README.md)
-  * [RemoteScalar](remotetensor/remotescalar.md)
-  * [RemoteVector](remotetensor/remotevector.md)
-  * [RemoteMatrix](remotetensor/remotematrix.md)
+* [Home](linalg32-api-reference/home.md)
+* [RemoteTensor](linalg32-api-reference/remotetensor/README.md)
+  * [RemoteScalar](linalg32-api-reference/remotetensor/remotescalar.md)
+  * [RemoteVector](linalg32-api-reference/remotetensor/remotevector.md)
+  * [RemoteMatrix](linalg32-api-reference/remotetensor/remotematrix.md)
