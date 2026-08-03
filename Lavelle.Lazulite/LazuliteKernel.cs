@@ -1,4 +1,4 @@
-﻿namespace Raphael.Lazulite;
+﻿namespace Lavelle.Lazulite;
 
 /// <summary>
 /// Holds a loaded kernel under a context.

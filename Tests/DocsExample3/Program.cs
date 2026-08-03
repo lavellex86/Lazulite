@@ -1,6 +1,6 @@
 ﻿using ILGPU;
 using ILGPU.Runtime;
-using Raphael.Lazulite;
+using Lavelle.Lazulite;
 using System.Drawing;
 
 using var lctx = new LazuliteContext();

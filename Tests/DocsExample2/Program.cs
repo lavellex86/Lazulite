@@ -1,6 +1,6 @@
 ﻿using ILGPU;
-using Raphael.Lazulite;
-using Raphael.Linalg32;
+using Lavelle.Lazulite;
+using Lavelle.Linalg32;
 
 using var lctx1 = new LazuliteContext(gpu: true, optimization: OptimizationLevel.Debug);
 using var lctx2 = new LazuliteContext(false, OptimizationLevel.O0);

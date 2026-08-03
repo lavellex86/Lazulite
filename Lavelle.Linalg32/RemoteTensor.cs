@@ -1,6 +1,7 @@
-﻿using Raphael.Lazulite;
+﻿using Lavelle.Lazulite;
+using System.Numerics;
 
-namespace Raphael.Linalg32;
+namespace Lavelle.Linalg32;
 
 /// <summary>
 /// Represents a tensor on the compute device.

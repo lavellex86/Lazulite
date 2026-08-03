@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Raphael.Linalg32\Raphael.Linalg32.csproj" />
+    <ProjectReference Include="..\..\Lavelle.Linalg32\Lavelle.Linalg32.csproj" />
   </ItemGroup>
 
 </Project>

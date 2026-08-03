@@ -1,6 +1,6 @@
-﻿using Raphael.Lazulite;
+﻿using Lavelle.Lazulite;
 
-namespace Raphael.Calc32;
+namespace Lavelle.Calc32;
 
 public static class CalcExtensions
 {

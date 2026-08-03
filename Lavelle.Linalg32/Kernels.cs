@@ -1,8 +1,8 @@
 ﻿
 using ILGPU;
-using Raphael.Lazulite;
+using Lavelle.Lazulite;
 
-namespace Raphael.Linalg32;
+namespace Lavelle.Linalg32;
 
 internal class Kernels(LazuliteContext lctx)
 {

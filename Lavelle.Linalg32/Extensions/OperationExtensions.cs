@@ -1,8 +1,8 @@
 ﻿using ILGPU.Runtime.Cuda;
-using Raphael.Lazulite;
+using Lavelle.Lazulite;
 using System.Runtime.CompilerServices;
 
-namespace Raphael.Linalg32;
+namespace Lavelle.Linalg32;
 
 public partial class LinalgExtensions
 {

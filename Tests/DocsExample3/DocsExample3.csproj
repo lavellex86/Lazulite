@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Raphael.Lazulite\Raphael.Lazulite.csproj" />
+    <ProjectReference Include="..\..\Lavelle.Lazulite\Lavelle.Lazulite.csproj" />
   </ItemGroup>
 
 </Project>

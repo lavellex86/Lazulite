@@ -2,7 +2,7 @@
 using ILGPU;
 using ILGPU.Algorithms;
 
-namespace Raphael.Linalg32;
+namespace Lavelle.Linalg32;
 
 internal partial class Implementations
 {

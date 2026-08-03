@@ -1,7 +1,7 @@
 ﻿using ILGPU;
 using ILGPU.Runtime;
 
-namespace Raphael.Lazulite;
+namespace Lavelle.Lazulite;
 
 /// <summary>
 /// Represents an object on the compute device.

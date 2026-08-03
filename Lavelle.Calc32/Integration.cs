@@ -1,11 +1,11 @@
 ﻿using ILGPU;
-using Raphael.Lazulite;
-using Raphael.Linalg32;
+using Lavelle.Lazulite;
+using Lavelle.Linalg32;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Raphael.Calc32
+namespace Lavelle.Calc32
 {
     public class IntegrationContext(LazuliteContext ctx)
     {

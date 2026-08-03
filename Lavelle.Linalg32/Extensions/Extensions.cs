@@ -1,10 +1,10 @@
 ﻿using ILGPU.Runtime.Cuda;
-using Raphael.Lazulite;
+using Lavelle.Lazulite;
 
-namespace Raphael.Linalg32;
+namespace Lavelle.Linalg32;
 
 /// <summary>
-/// A set of linear algebra extensions for the <c>Raphael.Lazulite</c> library.
+/// A set of linear algebra extensions for the <c>Lavelle.Lazulite</c> library.
 /// </summary>
 public static partial class LinalgExtensions
 {

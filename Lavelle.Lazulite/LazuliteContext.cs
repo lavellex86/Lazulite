@@ -2,7 +2,7 @@
 using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
 
-namespace Raphael.Lazulite;
+namespace Lavelle.Lazulite;
 
 /// <summary>
 /// Holds all information regarding the compute device and manages extension libraries.

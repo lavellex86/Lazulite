@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using Raphael.Lazulite;
-using Raphael.Linalg32;
+using Lavelle.Lazulite;
+using Lavelle.Linalg32;
 
 // ── Config ────────────────────────────────────────────────────────────────────
 

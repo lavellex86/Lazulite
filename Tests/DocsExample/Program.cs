@@ -1,6 +1,6 @@
 ﻿using ILGPU;
 using ILGPU.Runtime;
-using Raphael.Lazulite;
+using Lavelle.Lazulite;
 
 using var lctx = new LazuliteContext(); 
 using var pool = new BufferPool<int>(lctx);

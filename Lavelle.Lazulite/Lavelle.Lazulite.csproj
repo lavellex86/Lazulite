@@ -4,16 +4,16 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>2.2</Version>
+    <Version>2.4</Version>
     <Title>Lazulite</Title>
-    <Authors>raphael286</Authors>
+    <Authors>Julian Lavelle</Authors>
     <Description>Fast &amp; powerful GPU acceleration for C#.</Description>
-    <PackageProjectUrl>https://github.com/raphael286/Lazulite</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/raphael286/Lazulite</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/lavellex86/Lazulite</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/lavellex86/Lazulite</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Overhaul and documenation</PackageReleaseNotes>
+	<PackageReleaseNotes>Some corrections to rebrand</PackageReleaseNotes>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 

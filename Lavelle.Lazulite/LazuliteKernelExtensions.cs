@@ -1,6 +1,6 @@
 ﻿using ILGPU;
 
-namespace Raphael.Lazulite;
+namespace Lavelle.Lazulite;
 
 /// <summary>
 /// A set of extensions for <see cref="LazuliteKernel{T}"/>s allowing easy kernel calling.

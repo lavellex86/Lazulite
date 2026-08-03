@@ -1,4 +1,4 @@
-﻿using Raphael.Lazulite;
+﻿using Lavelle.Lazulite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Raphael.Linalg32
+namespace Lavelle.Linalg32
 {
     public static partial class LinalgExtensions
     {

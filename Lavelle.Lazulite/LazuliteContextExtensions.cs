@@ -1,7 +1,7 @@
 ﻿using ILGPU;
 using ILGPU.Runtime;
 
-namespace Raphael.Lazulite;
+namespace Lavelle.Lazulite;
 
 /// <summary>
 /// A set of extensions for the <see cref="LazuliteContext"/> allowing easy kernel loading.
