@@ -229,6 +229,24 @@ public partial class LinalgExtensions
         return Encase(x, r, (k, _r) => k.AxpyKernel.Call(_r.Length, _r, x, y, alpha));
     }
 
+    /// <summary>
+    /// Clamps the tensor elementwise between <paramref name="min"/> and <paramref name="max"/>.
+    /// </summary>
+    public static RemoteTensor<T> Clamp<T>(this LazuliteContext _, RemoteTensor<T> a, float min, float max, RemoteTensor<T>? r = null) where T : notnull =>
+    Encase(a, r, (k, _r) => k.ClampKernel.Call(_r.Length, _r, a, min, max));
+
+    /// <summary>
+    /// Takes the reciprocal of each element.
+    /// </summary>
+    public static RemoteTensor<T> Reciprocal<T>(this LazuliteContext _, RemoteTensor<T> a, RemoteTensor<T>? r = null) where T : notnull =>
+        Encase(a, r, (k, _r) => k.ReciprocalKernel.Call(_r.Length, _r, a));
+
+    /// <summary>
+    /// Takes the 2-argument arctangent of <paramref name="y"/> and <paramref name="x"/> elementwise.
+    /// </summary>
+    public static RemoteTensor<T> Atan2<T>(this LazuliteContext _, RemoteTensor<T> y, RemoteTensor<T> x, RemoteTensor<T>? r = null) where T : notnull =>
+        Encase(y, r, (k, _r) => k.Atan2Kernel.Call(_r.Length, _r, y, x));
+
     #endregion
 
     /// <summary>
@@ -374,9 +392,49 @@ public partial class LinalgExtensions
         lctx.GetKernels().DotKernel.Call(a.Length, r, a, b);
         return r;
     }
+
+    /// <summary>
+    /// Takes the L1 norm of a vector (sum of absolutes).
+    /// </summary>
+    public static RemoteTensor<float> L1Norm(this LazuliteContext lctx, RemoteTensor<float[]> v, RemoteTensor<float>? r = null, bool useCuBlas = true)
+    {
+        r ??= lctx.GetScalar(true);
+        if (useCuBlas)
+        {
+            lctx.GetCuBlas().Asum(v.Buffer.View.AsGeneral(), r.Buffer.View.AsContiguous());
+            return r;
+        }
+        lctx.GetKernels().L1NormKernel.Call(v.Length, r, v);
+        return r;
+    }
+
+    /// <summary>
+    /// Takes the L2 norm of a vector (sum of squares).
+    /// </summary>
+    public static RemoteTensor<float> L2Norm(this LazuliteContext lctx, RemoteTensor<float[]> v, RemoteTensor<float>? r = null, bool useCuBlas = true)
+    {
+        r ??= lctx.GetScalar(true);
+        if (useCuBlas)
+        {
+            lctx.GetCuBlas().Nrm2(v.Buffer.View.AsGeneral(), r.Buffer.View.AsContiguous());
+            return r;
+        }
+        lctx.GetKernels().L2NormKernel.Call(v.Length, r, v);
+        return r;
+    }
+
+    /// <summary>
+    /// Takes the sum of a vector.
+    /// </summary>
+    public static RemoteTensor<float> Sum(this LazuliteContext lctx, RemoteTensor<float[]> v, RemoteTensor<float>? r = null)
+    {
+        r ??= lctx.GetScalar(cleared: true);
+        lctx.GetKernels().SumKernel.Call(v.Length, r, v);
+        return r;
+    }
     #endregion
 
-    
+
 
     private static RemoteTensor<T> Encase<T>(RemoteTensor<T> inferFrom, RemoteTensor<T>? r, Action<Kernels, RemoteTensor<T>> action) where T : notnull
     {

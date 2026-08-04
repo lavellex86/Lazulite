@@ -50,28 +50,29 @@ public static partial class LinalgExtensions
     }
 
     /// <summary>
-    /// Interprets this tensor as a vector.
+    /// Inteprets this tensor as a scalar.
     /// </summary>
-    public static RemoteVector AsVector<T>(this RemoteTensor<T> tensor) where T : notnull => new(tensor.Buffer, tensor.Pool);
-    /// <summary>
-    /// Interprets this vector as a matrix.
-    /// </summary>
-    public static RemoteMatrix AsMatrix(this RemoteTensor<float[]> tensor)  => new(tensor.Buffer, tensor.Pool, tensor.Length);
-    /// <summary>
-    /// Interprets this <see cref="RemoteTensor{T}"/> matrix as a <see cref="RemoteMatrix"/> matrix.
-    /// </summary>
-    public static RemoteMatrix AsMatrix(this RemoteTensor<float[,]> tensor) => new(tensor.Buffer, tensor.Pool, tensor.Shape[0]);
+    public static RemoteScalar AsScalar<T>(this RemoteTensor<T> tensor) where T : notnull
+    {
+        if (tensor.Length != 1) throw new ArgumentException("Tensor is not length one", nameof(tensor));
+        else return new(tensor, tensor.Pool);
+    }
 
     /// <summary>
-    /// Casts a <see cref="RemoteTensor{T}"/> back to a <see cref="RemoteScalar"/>.
+    /// Interprets this tensor as a vector.
     /// </summary>
-    public static RemoteScalar CastScalar(this RemoteTensor<float> scalar) => (RemoteScalar)scalar;
+    public static RemoteVector AsVector<T>(this RemoteTensor<T> tensor) where T : notnull
+    {
+        if (tensor is RemoteVector vector) return vector;
+        else return new(tensor, tensor.Pool);
+    }
     /// <summary>
-    /// Casts a <see cref="RemoteTensor{T}"/> back to a <see cref="RemoteVector"/>.
+    /// Interprets this tensor as a matrix.
     /// </summary>
-    public static RemoteVector CastVector(this RemoteTensor<float[]> vector) => (RemoteVector)vector;
-    /// <summary>
-    /// Casts a <see cref="RemoteTensor{T}"/> back to a <see cref="RemoteMatrix"/>.
-    /// </summary>
-    public static RemoteMatrix CastMatrix(this RemoteTensor<float[,]> matrix) => (RemoteMatrix)matrix;
+    public static RemoteMatrix AsMatrix<T>(this RemoteTensor<T> tensor) where T : notnull
+    {
+        if (tensor is RemoteMatrix matrix) return matrix;
+        if (tensor is RemoteTensor<float[]> vector) return new(vector.Buffer, vector.Pool, vector.Length);
+        else throw new ArgumentException("Tensor cannot be interpeted as a matrix", nameof(tensor));
+    }
 }

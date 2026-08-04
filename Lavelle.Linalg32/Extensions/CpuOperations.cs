@@ -17,27 +17,7 @@ namespace Lavelle.Linalg32
         {
             var hostMatrix = matrix.Get();
             int n = hostMatrix.GetLength(0);
-            if (hostMatrix.GetLength(1) != n) throw new ArgumentException("Matrix must be square.");
-
-            var lu = (float[,])hostMatrix.Clone();
-            var piv = new int[n];
-
-            for (int k = 0; k < n; k++)
-            {
-                int p = k;
-                for (int i = k + 1; i < n; i++)
-                    if (MathF.Abs(lu[i, k]) > MathF.Abs(lu[p, k])) p = i;
-
-                for (int j = 0; j < n; j++) (lu[k, j], lu[p, j]) = (lu[p, j], lu[k, j]);
-                piv[k] = p;
-
-                if (lu[k, k] == 0f) throw new InvalidOperationException("Matrix is singular.");
-                for (int i = k + 1; i < n; i++)
-                {
-                    lu[i, k] /= lu[k, k];
-                    for (int j = k + 1; j < n; j++) lu[i, j] -= lu[i, k] * lu[k, j];
-                }
-            }
+            var (lu, piv, _) = DecomposeLU(hostMatrix);
 
             var inv = new float[n, n];
             for (int col = 0; col < n; col++)
@@ -60,6 +40,19 @@ namespace Lavelle.Linalg32
             }
 
             return (RemoteMatrix)lctx.GetMatrix(n, n).Set(inv);
+        }
+
+        /// <summary>
+        /// Computes the determinant of a square matrix on the CPU (syncing and transferring it from the compute device).
+        /// </summary>
+        public static float CpuDet(this LazuliteContext lctx, RemoteTensor<float[,]> matrix)
+        {
+            var (lu, _, sign) = DecomposeLU(matrix.Get());
+            int n = lu.GetLength(0);
+
+            var det = (float)sign;
+            for (int i = 0; i < n; i++) det *= lu[i, i];
+            return det;
         }
 
         /// <summary>
@@ -95,5 +88,75 @@ namespace Lavelle.Linalg32
                 sum += v[i];
             return sum;
         }
+
+        /// <summary>
+        /// Takes the trace of a matrix on the CPU (syncing and transferring it from the compute device).
+        /// </summary>
+        public static float CpuTrace(this LazuliteContext lctx, RemoteTensor<float[,]> matrix)
+        {
+            var m = matrix.Get();
+            var n = Math.Min(m.GetLength(0), m.GetLength(1));
+            var sum = 0f;
+            for (int i = 0; i < n; i++) sum += m[i, i];
+            return sum;
+        }
+
+        /// <summary>
+        /// Finds the index of the minimum element on the CPU (syncing and transferring it from the compute device).
+        /// </summary>
+        public static int CpuArgMin(this LazuliteContext lctx, RemoteTensor<float[]> vector)
+        {
+            var v = vector.Get();
+            var (minIdx, minVal) = (0, v[0]);
+            for (int i = 1; i < v.Length; i++)
+                if (v[i] < minVal) (minIdx, minVal) = (i, v[i]);
+            return minIdx;
+        }
+
+        /// <summary>
+        /// Finds the index of the maximum element on the CPU (syncing and transferring it from the compute device).
+        /// </summary>
+        public static int CpuArgMax(this LazuliteContext lctx, RemoteTensor<float[]> vector)
+        {
+            var v = vector.Get();
+            var (maxIdx, maxVal) = (0, v[0]);
+            for (int i = 1; i < v.Length; i++)
+                if (v[i] > maxVal) (maxIdx, maxVal) = (i, v[i]);
+            return maxIdx;
+        }
+
+        private static (float[,] lu, int[] piv, int sign) DecomposeLU(float[,] a)
+        {
+            int n = a.GetLength(0);
+            if (a.GetLength(1) != n) throw new ArgumentException("Matrix must be square.");
+
+            var lu = (float[,])a.Clone();
+            var piv = new int[n];
+            int sign = 1;
+
+            for (int k = 0; k < n; k++)
+            {
+                int p = k;
+                for (int i = k + 1; i < n; i++)
+                    if (MathF.Abs(lu[i, k]) > MathF.Abs(lu[p, k])) p = i;
+
+                if (p != k)
+                {
+                    for (int j = 0; j < n; j++) (lu[k, j], lu[p, j]) = (lu[p, j], lu[k, j]);
+                    sign = -sign;
+                }
+                piv[k] = p;
+
+                if (lu[k, k] == 0f) throw new InvalidOperationException("Matrix is singular.");
+                for (int i = k + 1; i < n; i++)
+                {
+                    lu[i, k] /= lu[k, k];
+                    for (int j = k + 1; j < n; j++) lu[i, j] -= lu[i, k] * lu[k, j];
+                }
+            }
+
+            return (lu, piv, sign);
+        }
+
     }
 }

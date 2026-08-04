@@ -101,4 +101,12 @@ internal partial class Implementations
 
     internal static void Dot(Index1D i, FAV r, FAV a, FAV b) => Atomic.Add(ref r[0], a[i] * b[i]);
     internal static void Axpy(Index1D i, FAV r, FAV a, FAV b, float alpha) => r[i] = alpha * a[i] + b[i];
+
+    internal static void L1Norm(Index1D i, FAV r, FAV v) => Atomic.Add(ref r[0], XMath.Abs(v[i]));
+    internal static void L2Norm(Index1D i, FAV r, FAV v) => Atomic.Add(ref v[0], v[i] * v[i]);
+
+    internal static void Clamp(Index1D i, FAV r, FAV x, float min, float max) => r[i] = XMath.Clamp(x[i], min, max);
+    internal static void Reciprocal(Index1D i, FAV r, FAV x) => r[i] = 1f / x[i];
+    internal static void Atan2(Index1D i, FAV r, FAV y, FAV x) => r[i] = XMath.Atan2(y[i], x[i]);
+    internal static void Sum(Index1D i, FAV r, FAV x) => Atomic.Add(ref r[0], x[i]);
 }

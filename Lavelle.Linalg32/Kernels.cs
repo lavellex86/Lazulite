@@ -60,4 +60,12 @@ internal class Kernels(LazuliteContext lctx)
 
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV>> DotKernel = new(Implementations.Dot, lctx);
     internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV, float>> AxpyKernel = new(Implementations.Axpy, lctx);
+
+    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV>> L1NormKernel = new(Implementations.L1Norm, lctx);
+    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV>> L2NormKernel = new(Implementations.L2Norm, lctx);
+
+    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, float, float>> ClampKernel = new(Implementations.Clamp, lctx);
+    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV>> ReciprocalKernel = new(Implementations.Reciprocal, lctx);
+    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV, FAV>> Atan2Kernel = new(Implementations.Atan2, lctx);
+    internal readonly LazuliteKernel<Action<Index1D, FAV, FAV>> SumKernel = new(Implementations.Sum, lctx);
 }

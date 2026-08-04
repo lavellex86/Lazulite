@@ -10,11 +10,11 @@
     <PackageProjectUrl>https://github.com/lavellex86/Lazulite</PackageProjectUrl>
     <RepositoryUrl>https://github.com/lavellex86/Lazulite.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Version>2.4.0</Version>
+    <Version>2.4.2</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <PackageReleaseNotes>Some corrections with the rebrand</PackageReleaseNotes>
+    <PackageReleaseNotes>Final batch of ops</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

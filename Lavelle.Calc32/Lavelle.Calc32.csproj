@@ -7,12 +7,12 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>Lavelle.Calc32</PackageId>
     <Title>Lavelle.Calc32</Title>
-    <Version>2.2.3.0</Version>
+    <Version>2.2.4.0</Version>
     <Authors>Julian Lavelle</Authors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lavelle.Linalg32" Version="2.2.3" />
+    <PackageReference Include="Lavelle.Linalg32" Version="2.4.1" />
   </ItemGroup>
 
 </Project>
