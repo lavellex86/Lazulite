@@ -3,7 +3,7 @@
 To enable `Lavelle.Linalg32`, simply call the extension `.EnableLinalg32` on your `LazuliteContext`:
 
 {% code overflow="wrap" %}
-```
+```csharp
 var lctx = new LazuliteContext().EnableLinalg32();
 ```
 {% endcode %}
@@ -11,7 +11,7 @@ var lctx = new LazuliteContext().EnableLinalg32();
 Once you've done that, you're free to call any `Linalg32` extension from the context. To get a new scalar, vector, or matrix:
 
 {% code overflow="wrap" %}
-```
+```csharp
 var scalar = lctx.GetScalar(cleared: false); // grabs a new non-zero initialized scalar from the pool
 var vector = lctx.GetVector(5); // grabs a length 5 vector from the pool; not cleared by default
 var matrix = lctx.GetMatrix(2, 2); // grabs a 2x2 matrix from the pool
@@ -21,7 +21,7 @@ var matrix = lctx.GetMatrix(2, 2); // grabs a 2x2 matrix from the pool
 To interpret or cast a tensor to a scalar, vector, or matrix:
 
 {% code overflow="wrap" %}
-```
+```csharp
 var maybeScalar = (RemoteTensor<float>)scalar; // losing type info
 var maybeVector = (RemoteTensor<float[]>)vector;
 var maybeMatrix = (RemoteTensor<float[,]>)matrix;
@@ -30,14 +30,14 @@ scalar = scalar.AsScalar(); // casts back to RemoteScalar
 vector = vector.AsVector(); // casts back to RemoteVector
 matrix = matrix.AsMatrix(); // casts back to RemoteMatrix
 // scalar = vector.AsScalar(); will throw, vector is not length 1
-// vector = matrix.AsVector(); is fine, any tensor can become a vector
+// vector = matrix.AsVector(); is fine, any tensor can become a vector becaus they're 1D buffer's underneath
 ```
 {% endcode %}
 
 Calling operations is simple:
 
 {% code overflow="wrap" %}
-```
+```csharp
 var a = lctx.GetVector(3);
 var b = lctx.GetVector(3); // get some vectors
 var sum = lctx.Add(a, b);
