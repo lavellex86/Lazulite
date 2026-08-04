@@ -52,26 +52,27 @@ public static partial class LinalgExtensions
     /// <summary>
     /// Inteprets this tensor as a scalar.
     /// </summary>
-    public static RemoteScalar AsScalar<T>(this RemoteTensor<T> tensor) where T : notnull
+    public static RemoteScalar AsScalar<T>(this RemoteBase<float, T> tensor) where T : notnull
     {
         if (tensor.Length != 1) throw new ArgumentException("Tensor is not length one", nameof(tensor));
-        else return new(tensor, tensor.Pool);
+        else return new(tensor.Buffer, tensor.Pool);
     }
 
     /// <summary>
     /// Interprets this tensor as a vector.
     /// </summary>
-    public static RemoteVector AsVector<T>(this RemoteTensor<T> tensor) where T : notnull
+    public static RemoteVector AsVector<T>(this RemoteBase<float, T> tensor) where T : notnull
     {
         if (tensor is RemoteVector vector) return vector;
-        else return new(tensor, tensor.Pool);
+        else return new(tensor.Buffer, tensor.Pool);
     }
     /// <summary>
     /// Interprets this tensor as a matrix.
     /// </summary>
-    public static RemoteMatrix AsMatrix<T>(this RemoteTensor<T> tensor) where T : notnull
+    public static RemoteMatrix AsMatrix<T>(this RemoteBase<float, T> tensor) where T : notnull
     {
         if (tensor is RemoteMatrix matrix) return matrix;
+        if (tensor is RemoteTensor<float> scalar) return new(scalar.Buffer, scalar.Pool, 1);
         if (tensor is RemoteTensor<float[]> vector) return new(vector.Buffer, vector.Pool, vector.Length);
         else throw new ArgumentException("Tensor cannot be interpeted as a matrix", nameof(tensor));
     }

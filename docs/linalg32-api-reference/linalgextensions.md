@@ -533,3 +533,11 @@ public static int CpuArgMax(this LazuliteContext lctx, RemoteTensor<float[]> vec
 ```
 
 Finds the index of the maximum element on the CPU (syncing and transferring it from the compute device).
+
+***
+
+```csharp
+public static (RemoteMatrix lu, RemoteVector piv, int sign) CpuDecomposeLU(this LazuliteContext lctx, RemoteMatrix x)
+```
+
+Takes the LU decomposition of a matrix on the CPU (syncing and transferring it from the compute device).

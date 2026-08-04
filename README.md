@@ -28,7 +28,7 @@ class RemoteIntArray(MemoryBuffer1D<int, Stride1D.Dense> buffer, BufferPool<int>
     protected override int[] ConvertToRaw(int[] host) => host;
 }
 ```
-## `Lavelle.Linalg32`, and `Lavelle.Calc32` Overview
-`Linalg32` and `Calc32` host various extension methods and classes implementing Lazulite's primitives, including integration methods and tensor operations.
+## `Lavelle.Linalg32`, `Lavelle.Calc32`, and `Lavelle.Stats32` Overview
+`Linalg32`, `Calc32`, and `Stats32` host various extension methods and classes implementing Lazulite's primitives, including numerical/statistical methods, tensor operations, and more.
 
-You can find the docs for all three packages [here](https://lavelle.gitbook.io/lazulite-documentation).
+You can find the docs for all four packages [here](https://lavelle.gitbook.io/lazulite-documentation).

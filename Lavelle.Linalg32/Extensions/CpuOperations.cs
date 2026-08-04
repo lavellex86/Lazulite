@@ -125,12 +125,24 @@ namespace Lavelle.Linalg32
             return maxIdx;
         }
 
-        private static (float[,] lu, int[] piv, int sign) DecomposeLU(float[,] a)
+        /// <summary>
+        /// Takes the LU decomposition of a matrix on the CPU (syncing and transferring it from the compute device).
+        /// </summary>
+        public static (RemoteMatrix lu, RemoteVector piv, int sign) CpuDecomposeLU(this LazuliteContext lctx, RemoteMatrix x)
         {
-            int n = a.GetLength(0);
-            if (a.GetLength(1) != n) throw new ArgumentException("Matrix must be square.");
+            (var lu, var piv, var sign) = DecomposeLU(x.Get());
+            return (
+                lctx.GetMatrix(lu.GetLength(0), lu.GetLength(0)).Set(lu).AsMatrix(),
+                lctx.GetVector(piv.Length).Set([.. piv.Select(i => (float)i)]).AsVector(),
+                sign);
+        }
 
-            var lu = (float[,])a.Clone();
+        private static (float[,] lu, int[] piv, int sign) DecomposeLU(float[,] x)
+        {
+            int n = x.GetLength(0);
+            if (x.GetLength(1) != n) throw new ArgumentException("Matrix must be square.");
+
+            var lu = (float[,])x.Clone();
             var piv = new int[n];
             int sign = 1;
 

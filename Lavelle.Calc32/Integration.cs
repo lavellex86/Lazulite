@@ -17,10 +17,10 @@ namespace Lavelle.Calc32
             _eulerKernel.Call(F.Length, F, f, prevF, dx);
             return F;
         }
-        public RemoteVector VerletStep(RemoteVector FPrev, RemoteVector FPrePrev, RemoteVector d2FPrev, float dx)
+        public RemoteVector VerletStep(RemoteVector FPrev, RemoteVector FPrePrev, RemoteVector dfPrev, float dx)
         {
             var F = Context.GetVector(FPrev.Length);
-            _verletKernel.Call(F.Length, F, FPrev, FPrePrev, d2FPrev, dx);
+            _verletKernel.Call(F.Length, F, FPrev, FPrePrev, dfPrev, dx);
             return F;
         }
         public (RemoteVector F, RemoteVector dF) VelVerletStep(RemoteVector FPrev, RemoteVector fPrev, RemoteVector dfPrev, RemoteVector df, float dx)
@@ -34,15 +34,14 @@ namespace Lavelle.Calc32
         public RemoteVector[] EulerIntegrate(RemoteVector[] f, RemoteVector initialF, float dx)
         {
             var steps = f.Length;
-            var F = new RemoteVector[steps + 1];
+            var F = new RemoteVector[steps];
             F[0] = initialF;
-            for (int i = 0; i < steps; i++) F[i + 1] = EulerStep(f[i], F[i], dx);
+            for (int i = 1; i < steps; i++) F[i] = EulerStep(f[i], F[i], dx);
             return F;
         }
 
-
         private LazuliteKernel<Action<Index1D, FAV, FAV, FAV, float>> _eulerKernel = new((i, F, f, prev, dx) => F[i] = prev[i] + f[i] * dx, ctx);
-        private LazuliteKernel<Action<Index1D, FAV, FAV, FAV, FAV, float>> _verletKernel = new((i, F, FPrev, FPrePrev, d2FPrev, dx) => F[i] = 2 * FPrev[i] - FPrePrev[i] + d2FPrev[i] * dx * dx, ctx);
+        private LazuliteKernel<Action<Index1D, FAV, FAV, FAV, FAV, float>> _verletKernel = new((i, F, FPrev, FPrePrev, dfPrev, dx) => F[i] = 2 * FPrev[i] - FPrePrev[i] + dfPrev[i] * dx * dx, ctx);
         private LazuliteKernel<Action<Index1D, FAV, FAV, FAV, FAV, FAV, FAV, float>> _velVerletKernel = new((i, F, f, FPrev, fPrev, dfPrev, df, dx) =>
         {
             F[i] = FPrev[i] + fPrev[i] * dx + 0.5f * dfPrev[i] * dx * dx;
