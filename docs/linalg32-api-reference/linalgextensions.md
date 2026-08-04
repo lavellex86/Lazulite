@@ -4,8 +4,6 @@
 Try using `Ctrl-f` to find what you're looking for on this page.
 {% endhint %}
 
-# LinalgExtensions
-
 ```csharp
 public static class LinalgExtensions
 ```
@@ -14,7 +12,7 @@ A set of linear algebra extensions for the `Lavelle.Lazulite` library.
 
 ***
 
-## Tensor Extension Methods
+### Tensor Extension Methods
 
 ```csharp
 public static RemoteScalar AsScalar<T>(this RemoteTensor<T> tensor) where T : notnull
@@ -40,9 +38,9 @@ Interprets this tensor as a matrix.
 
 ***
 
-## Context Extension Methods
+### Context Extension Methods
 
-### Allocation
+#### Allocation
 
 ```csharp
 public static RemoteScalar GetScalar(this LazuliteContext lctx, bool cleared = false)
@@ -76,7 +74,7 @@ Enables the `Linalg32` library on this context.
 
 ***
 
-### Elementwise Operations
+#### Elementwise Operations
 
 ```csharp
 public static RemoteTensor<T> Add<T>(this LazuliteContext _, RemoteTensor<T> a, RemoteTensor<T> b, RemoteTensor<T>? r = null) where T : notnull
@@ -230,7 +228,7 @@ public static RemoteTensor<T> Axpy<T>(this LazuliteContext lctx, RemoteTensor<T>
 
 ***
 
-### Math Functions
+#### Math Functions
 
 ```csharp
 public static RemoteTensor<T> Exp<T>(this LazuliteContext _, RemoteTensor<T> a, RemoteTensor<T>? r = null) where T : notnull
@@ -376,7 +374,7 @@ Truncates each element of a tensor toward zero, discarding any fractional part.
 
 ***
 
-### Tensor Operations
+#### Tensor Operations
 
 ```csharp
 public static RemoteTensor<float[,]> OuterProduct(this LazuliteContext ctx, RemoteTensor<float[]> a, RemoteTensor<float[]> b, RemoteTensor<float[,]>? r = null, float alpha = 1f, float beta = 0f, bool useCuBlas = true)
@@ -474,7 +472,7 @@ Takes the sum of a vector.
 
 ***
 
-### CPU Operations
+#### CPU Operations
 
 ```csharp
 public static RemoteTensor<float[,]> CpuInvert(this LazuliteContext lctx, RemoteTensor<float[,]> matrix)
