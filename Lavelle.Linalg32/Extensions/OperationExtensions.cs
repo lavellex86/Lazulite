@@ -357,7 +357,7 @@ public partial class LinalgExtensions
     }
 
     /// <summary>
-    /// Transposes a tensor along the specified dimension.
+    /// Transposes a matrix.
     /// </summary>
     public static RemoteTensor<float[,]> Transpose(this LazuliteContext ctx, RemoteTensor<float[,]> source, RemoteTensor<float[,]>? r = null)
     {

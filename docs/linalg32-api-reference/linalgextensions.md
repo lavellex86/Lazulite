@@ -406,7 +406,7 @@ Multiplies a matrix by a vector, optionally transposing the matrix. Supports sca
 public static RemoteTensor<float[,]> Transpose(this LazuliteContext ctx, RemoteTensor<float[,]> source, RemoteTensor<float[,]>? r = null)
 ```
 
-Transposes a tensor along the specified dimension.
+Transposes a matrix.
 
 ***
 
