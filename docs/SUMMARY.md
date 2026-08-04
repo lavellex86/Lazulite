@@ -22,3 +22,4 @@
   * [RemoteScalar](linalg32-api-reference/remotetensor/remotescalar.md)
   * [RemoteVector](linalg32-api-reference/remotetensor/remotevector.md)
   * [RemoteMatrix](linalg32-api-reference/remotetensor/remotematrix.md)
+* [LinalgExtensions](linalg32-api-reference/linalgextensions.md)
