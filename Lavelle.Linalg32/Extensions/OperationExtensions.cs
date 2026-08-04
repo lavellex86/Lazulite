@@ -333,10 +333,10 @@ public partial class LinalgExtensions
     /// Multiplies a matrix by a vector, optionally transposing the matrix. Supports scaling via
     /// <paramref name="alpha"/> and <paramref name="beta"/> in the same manner as <see cref="MatrixMultiply"/>.
     /// </summary>
-    public static RemoteTensor<float[]> MatrixVectorMultiply(this LazuliteContext ctx, RemoteTensor<float[,]> m, RemoteTensor<float[]> v, int m0, float alpha = 1.0f, float beta = 0.0f,
+    public static RemoteTensor<float[]> MatrixVectorMultiply(this LazuliteContext ctx, RemoteTensor<float[,]> m, RemoteTensor<float[]> v, float alpha = 1.0f, float beta = 0.0f,
         RemoteTensor<float[]>? r = null, bool transposeM = false, bool useCuBlas = true)
     {
-        var m1 = m.Length / m0;
+        int m0 = m.Shape[0], m1 = m.Shape[1];
         r ??= ctx.GetVector(transposeM ? m0 : m1);
         if (useCuBlas)
         {

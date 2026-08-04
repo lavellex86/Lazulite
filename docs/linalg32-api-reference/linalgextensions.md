@@ -72,8 +72,6 @@ Enables the `Linalg32` library on this context.
 
 ***
 
-#### Elementwise Operations
-
 ```csharp
 public static RemoteTensor<T> Add<T>(this LazuliteContext _, RemoteTensor<T> a, RemoteTensor<T> b, RemoteTensor<T>? r = null) where T : notnull
 ```
@@ -226,8 +224,6 @@ public static RemoteTensor<T> Axpy<T>(this LazuliteContext lctx, RemoteTensor<T>
 
 ***
 
-#### Math Functions
-
 ```csharp
 public static RemoteTensor<T> Exp<T>(this LazuliteContext _, RemoteTensor<T> a, RemoteTensor<T>? r = null) where T : notnull
 ```
@@ -372,8 +368,6 @@ Truncates each element of a tensor toward zero, discarding any fractional part.
 
 ***
 
-#### Tensor Operations
-
 ```csharp
 public static RemoteTensor<float[,]> OuterProduct(this LazuliteContext ctx, RemoteTensor<float[]> a, RemoteTensor<float[]> b, RemoteTensor<float[,]>? r = null, float alpha = 1f, float beta = 0f, bool useCuBlas = true)
 ```
@@ -391,7 +385,7 @@ Multiplies two matrices, optionally transposing either input. Supports scaling t
 ***
 
 ```csharp
-public static RemoteTensor<float[]> MatrixVectorMultiply(this LazuliteContext ctx, RemoteTensor<float[,]> m, RemoteTensor<float[]> v, int m0, float alpha = 1.0f, float beta = 0.0f, RemoteTensor<float[]>? r = null, bool transposeM = false, bool useCuBlas = true)
+public static RemoteTensor<float[]> MatrixVectorMultiply(this LazuliteContext ctx, RemoteTensor<float[,]> m, RemoteTensor<float[]> v, float alpha = 1.0f, float beta = 0.0f, RemoteTensor<float[]>? r = null, bool transposeM = false, bool useCuBlas = true)
 ```
 
 Multiplies a matrix by a vector, optionally transposing the matrix. Supports scaling via `alpha` and `beta` in the same manner as `MatrixMultiply`.
@@ -470,8 +464,6 @@ Takes the sum of a vector.
 
 ***
 
-#### CPU Operations
-
 ```csharp
 public static RemoteTensor<float[,]> CpuInvert(this LazuliteContext lctx, RemoteTensor<float[,]> matrix)
 ```
@@ -549,3 +541,10 @@ public static (RemoteMatrix q, RemoteMatrix r) CpuDecomposeQR(this LazuliteConte
 ```
 
 Takes the QR decomposition of a matrix on the CPU (syncing and transferring it from the compute device).
+
+***
+
+```csharp
+public static RemoteVector LeastSquares(this LazuliteContext lctx, RemoteMatrix a, RemoteVector b)
+```
+Solves ||Ax - b||^2 for x.

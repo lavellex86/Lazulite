@@ -67,6 +67,7 @@ The full list of all operations in `Linalg32`:
 - `CpuInvert`, `CpuDet`, `CpuL1Norm`, `CpuL2Norm`
 - `CpuSum`, `CpuTrace`, `CpuArgMin`, `CpuArgMax`
 - `CpuDecomposeLU`, `CpuDecomposeQR`
+- `LeastSquares`
 
 Reference [linalgextensions.md](linalgextensions.md "mention") for details on all available operations.
 
