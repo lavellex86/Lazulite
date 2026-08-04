@@ -40,8 +40,6 @@ Interprets this tensor as a matrix.
 
 ### Context Extension Methods
 
-#### Allocation
-
 ```csharp
 public static RemoteScalar GetScalar(this LazuliteContext lctx, bool cleared = false)
 ```

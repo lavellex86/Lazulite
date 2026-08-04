@@ -9,7 +9,6 @@
 
 ## Lazulite API Reference
 
-* [Home](lazulite-api-reference/home.md)
 * [RemoteBase](lazulite-api-reference/remotebase.md)
 * [BufferPool](lazulite-api-reference/bufferpool.md)
 * [LazuliteContext](lazulite-api-reference/lazulitecontext.md)
@@ -17,7 +16,7 @@
 
 ## Linalg32 API Reference
 
-* [Home](linalg32-api-reference/home.md)
+* [Getting Started](linalg32-api-reference/getting-started.md)
 * [RemoteTensor](linalg32-api-reference/remotetensor/README.md)
   * [RemoteScalar](linalg32-api-reference/remotetensor/remotescalar.md)
   * [RemoteVector](linalg32-api-reference/remotetensor/remotevector.md)
