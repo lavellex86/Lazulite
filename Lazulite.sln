@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lavelle.Lazulite", "Lavelle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lavelle.Linalg32", "Lavelle.Linalg32\Lavelle.Linalg32.csproj", "{DBC27BB8-F1CD-CE9C-03AF-606B173D609D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocsExample4", "Tests\DocsExample4\DocsExample4.csproj", "{A2945C70-5E42-2351-CC45-8A1E0D10A53A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{DBC27BB8-F1CD-CE9C-03AF-606B173D609D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBC27BB8-F1CD-CE9C-03AF-606B173D609D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBC27BB8-F1CD-CE9C-03AF-606B173D609D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2945C70-5E42-2351-CC45-8A1E0D10A53A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2945C70-5E42-2351-CC45-8A1E0D10A53A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2945C70-5E42-2351-CC45-8A1E0D10A53A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2945C70-5E42-2351-CC45-8A1E0D10A53A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -62,6 +68,7 @@ Global
 		{AF583FBF-AD20-6560-B0C4-D74D6CD7C5FE} = {FC40244E-D01D-4D76-865A-67F2DB6A2D0E}
 		{FC31AC44-291A-9C3C-09E3-E84AAE0D99FD} = {FC40244E-D01D-4D76-865A-67F2DB6A2D0E}
 		{FBD07F37-386A-AA84-41D8-984C6432C09F} = {FC40244E-D01D-4D76-865A-67F2DB6A2D0E}
+		{A2945C70-5E42-2351-CC45-8A1E0D10A53A} = {FC40244E-D01D-4D76-865A-67F2DB6A2D0E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CCA16F5A-E6B3-4073-B4D8-4F2AAA5A7294}
