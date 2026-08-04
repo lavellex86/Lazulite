@@ -55,3 +55,7 @@ Reference [linalgextensions.md](linalgextensions.md "mention") for all available
 Some operations use `alpha` and `beta` values; these use the form `r = f * alpha + r * beta`, where `f` is the operation. For example, in a matrix multiply, setting `beta = 1` allows us to accumulate the product into `r` rather than overwriting it.
 
 Some operations also have a `useCuBlas` parameter, which will significantly speed up the operation. It's recommended to leave this on whenever possible (but note that it will conly take effect on CUDA compute devices).
+
+{% hint style="info" %}
+You can view the full script for this page [here](https://github.com/lavellex86/Lazulite/blob/main/Tests/DocsExample4/Program.cs).
+{% endhint %}
