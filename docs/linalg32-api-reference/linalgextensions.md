@@ -541,3 +541,11 @@ public static (RemoteMatrix lu, RemoteVector piv, int sign) CpuDecomposeLU(this 
 ```
 
 Takes the LU decomposition of a matrix on the CPU (syncing and transferring it from the compute device).
+
+***
+
+```csharp
+public static (RemoteMatrix q, RemoteMatrix r) CpuDecomposeQR(this LazuliteContext lctx, RemoteMatrix x)
+```
+
+Takes the QR decomposition of a matrix on the CPU (syncing and transferring it from the compute device).

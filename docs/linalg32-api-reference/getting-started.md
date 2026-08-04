@@ -56,6 +56,24 @@ Some operations use `alpha` and `beta` values; these use the form `r = f * alpha
 
 Some operations also have a `useCuBlas` parameter, which will significantly speed up the operation. It's recommended to leave this on whenever possible (but note that it will conly take effect on CUDA compute devices).
 
+The full list of all operations in `Linalg32`:
+- `Add`, `Subtract`, `Multiply`, `Divide`
+- `AddScalar`, `SubtractScalar`, `MultiplyScalar`, `DivideScalar`
+- `Negate`, `Reciprocal`, `Abs`, `Sign`
+- `Min`, `Max`, `MinScalar`, `MaxScalar`
+- `Clamp`, `Fill`, `Axpy`
+- `Exp`, `Log`, `Log10`, `Log2`
+- `Sqrt`, `Pow`, `PowScalar`, `Sin`
+- `Cos`, `Tan`, `Sinh`, `Cosh`
+- `Tanh`, `Atan2`, `Floor`, `Ceiling`
+- `Round`, `Truncate`
+- `OuterProduct`, `MatrixMultiply`, `MatrixVectorMultiply`, `Transpose`
+- `BroadcastMatrixVectorAdd`, `NarrowcastVectorMatrixAdd`, `Concat`, `Slice`
+- `Dot`, `L1Norm`, `L2Norm`, `Sum`
+- `CpuInvert`, `CpuDet`, `CpuL1Norm`, `CpuL2Norm`
+- `CpuSum`, `CpuTrace`, `CpuArgMin`, `CpuArgMax`
+- `CpuDecomposeLU`, `CpuDecomposeQR`
+
 {% hint style="info" %}
 You can view the full script for this page [here](https://github.com/lavellex86/Lazulite/blob/main/Tests/DocsExample4/Program.cs).
 {% endhint %}

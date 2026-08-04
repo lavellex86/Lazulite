@@ -137,6 +137,19 @@ namespace Lavelle.Linalg32
                 sign);
         }
 
+        /// <summary>
+        /// Takes the QR decomposition of a matrix on the CPU (syncing and transferring it from the compute device).
+        /// </summary>
+        public static (RemoteMatrix q, RemoteMatrix r) CpuDecomposeQR(this LazuliteContext lctx, RemoteMatrix x)
+        {
+            var (q, r) = DecomposeQR(x.Get());
+            int m = q.GetLength(0), n = r.GetLength(1);
+            return (
+                lctx.GetMatrix(m, m).Set(q).AsMatrix(),
+                lctx.GetMatrix(m, n).Set(r).AsMatrix());
+        }
+
+        #region Helpers
         private static (float[,] lu, int[] piv, int sign) DecomposeLU(float[,] x)
         {
             int n = x.GetLength(0);
@@ -170,5 +183,67 @@ namespace Lavelle.Linalg32
             return (lu, piv, sign);
         }
 
+        private static (float[,] q, float[,] r) DecomposeQR(float[,] x)
+        {
+            int m = x.GetLength(0), n = x.GetLength(1);
+            var r = (float[,])x.Clone();
+            var q = I(m);
+
+            for (int k = 0; k < Math.Min(m - 1, n); k++)
+            {
+                var v = new float[m - k];
+                for (int i = k; i < m; i++) v[i - k] = r[i, k];
+
+                float norm = 0f;
+                for (int i = 0; i < v.Length; i++) norm += v[i] * v[i];
+                norm = MathF.Sqrt(norm);
+                if (norm == 0f) continue;
+
+                v[0] += MathF.CopySign(norm, v[0]);
+
+                float vnorm2 = 0f;
+                for (int i = 0; i < v.Length; i++) vnorm2 += v[i] * v[i];
+
+                ApplyHouseholder(r, v, k, vnorm2, fromLeft: true);
+                ApplyHouseholder(q, v, k, vnorm2, fromLeft: false);
+            }
+
+            return (q, r);
+        }
+
+        private static float[,] I(int n)
+        {
+            var m = new float[n, n];
+            for (int i = 0; i < n; i++) m[i, i] = 1f;
+            return m;
+        }
+
+        private static void ApplyHouseholder(float[,] m, float[] v, int k, float vnorm2, bool fromLeft)
+        {
+            int rows = m.GetLength(0), cols = m.GetLength(1);
+            int vLen = v.Length;
+
+            if (fromLeft)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    var dot = 0f;
+                    for (int i = 0; i < vLen; i++) dot += v[i] * m[k + i, j];
+                    var scale = 2f * dot / vnorm2;
+                    for (int i = 0; i < vLen; i++) m[k + i, j] -= scale * v[i];
+                }
+            }
+            else
+            {
+                for (int i = 0; i < rows; i++)
+                {
+                    var dot = 0f;
+                    for (int j = 0; j < vLen; j++) dot += m[i, k + j] * v[j];
+                    var scale = 2f * dot / vnorm2;
+                    for (int j = 0; j < vLen; j++) m[i, k + j] -= scale * v[j];
+                }
+            }
+        }
+        #endregion
     }
 }
