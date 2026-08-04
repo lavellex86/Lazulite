@@ -52,7 +52,7 @@ We can't operate on remotes the way we'd operate on a runtime object. Instead, w
 {% code overflow="wrap" %}
 ```csharp
 var kernel = new LazuliteKernel<Action<Index1D, ArrayView1D<int, Stride1D.Dense>>>((i, arr) => arr[i] += 1, lctx); // (i, arr) => arr[i] += 1 runs for each element
-kernel.Call(3, remote.Buffer); // we'll call it with an extent of 3 (3 elements) on the remote's bufer
+kernel.Call(3, remote.Buffer); // we'll call it with an extent of 3 (3 elements) on the remote's buffer
 ```
 {% endcode %}
 
