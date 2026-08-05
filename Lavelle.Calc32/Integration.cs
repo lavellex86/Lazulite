@@ -3,55 +3,73 @@ using Lavelle.Lazulite;
 using Lavelle.Linalg32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Lavelle.Calc32
 {
-    public class IntegrationContext(LazuliteContext ctx)
+    public partial class CalcContext
     {
-        public LazuliteContext Context { get; set; } = ctx;
-
+        #region Steps
         public RemoteVector EulerStep(RemoteVector f, RemoteVector prevF, float dx)
         {
-            var F = Context.GetVector(f.Length);
+            var F = LContext.GetVector(f.Length);
             _eulerKernel.Call(F.Length, F, f, prevF, dx);
             return F;
         }
         public RemoteVector VerletStep(RemoteVector FPrev, RemoteVector FPrePrev, RemoteVector dfPrev, float dx)
         {
-            var F = Context.GetVector(FPrev.Length);
+            var F = LContext.GetVector(FPrev.Length);
             _verletKernel.Call(F.Length, F, FPrev, FPrePrev, dfPrev, dx);
             return F;
         }
-        public (RemoteVector F, RemoteVector dF) VelVerletStep(RemoteVector FPrev, RemoteVector fPrev, RemoteVector dfPrev, RemoteVector df, float dx)
+        public (RemoteVector F, RemoteVector f) VelVerletStep(RemoteVector FPrev, RemoteVector fPrev, RemoteVector dfPrev, RemoteVector df, float dx)
         {
-            var F = Context.GetVector(FPrev.Length);
-            var dF = Context.GetVector(FPrev.Length);
-            _velVerletKernel.Call(F.Length, F, dF, FPrev, fPrev, dfPrev, df, dx);
-            return (F, dF);
+            var F = LContext.GetVector(FPrev.Length);
+            var f = LContext.GetVector(FPrev.Length);
+            _velVerletKernel.Call(F.Length, F, f, FPrev, fPrev, dfPrev, df, dx);
+            return (F, f);
         }
-
+        #endregion
+        #region Integrations
         public RemoteVector[] EulerIntegrate(RemoteVector[] f, RemoteVector initialF, float dx)
         {
             var steps = f.Length;
             var F = new RemoteVector[steps];
             F[0] = initialF;
-            for (int i = 1; i < steps; i++) F[i] = EulerStep(f[i], F[i], dx);
+            for (int i = 1; i < steps; i++) F[i] = EulerStep(f[i], F[i - 1], dx);
             return F;
         }
 
-        private LazuliteKernel<Action<Index1D, FAV, FAV, FAV, float>> _eulerKernel = new((i, F, f, prev, dx) => F[i] = prev[i] + f[i] * dx, ctx);
-        private LazuliteKernel<Action<Index1D, FAV, FAV, FAV, FAV, float>> _verletKernel = new((i, F, FPrev, FPrePrev, dfPrev, dx) => F[i] = 2 * FPrev[i] - FPrePrev[i] + dfPrev[i] * dx * dx, ctx);
-        private LazuliteKernel<Action<Index1D, FAV, FAV, FAV, FAV, FAV, FAV, float>> _velVerletKernel = new((i, F, f, FPrev, fPrev, dfPrev, df, dx) =>
+        public RemoteVector[] VerletIntegrate(RemoteVector[] df, RemoteVector initialF, RemoteVector initialf, float dx)
         {
-            F[i] = FPrev[i] + fPrev[i] * dx + 0.5f * dfPrev[i] * dx * dx;
-            f[i] = fPrev[i] + 0.5f * (dfPrev[i] + df[i]) * dx;
-        }, ctx);
+            var steps = df.Length;
+            var F = new RemoteVector[steps];
+            F[0] = initialF;
+            F[1] = EulerStep(initialf, initialF, dx);
+            for (int i = 2; i < steps; i++) F[i] = VerletStep(F[i - 1], F[i - 2], df[i - 1], dx);
+            return F;
+        }
+
+        public (RemoteVector[] F, RemoteVector[] f) VelVerletIntegrate(RemoteVector[] df, RemoteVector initialF, RemoteVector initialf, float dx)
+        {
+            var steps = df.Length;
+            RemoteVector[] f = new RemoteVector[steps], F = new RemoteVector[steps];
+            f[0] = initialf; F[0] = initialF;
+            f[1] = EulerStep(df[1], f[0], dx); F[0] = EulerStep(f[1], F[0], dx);
+            for (int i = 2; i < steps; i++) (F[i], f[i]) = VelVerletStep(F[i - 1], f[i - 1], df[i - 1], df[i], dx);
+            return (F, f);
+        }
+        #endregion
+
+        private LazuliteKernel<Action<Index1D, FAV, FAV, FAV, float>> _eulerKernel;
+        private LazuliteKernel<Action<Index1D, FAV, FAV, FAV, FAV, float>> _verletKernel;
+        private LazuliteKernel<Action<Index1D, FAV, FAV, FAV, FAV, FAV, FAV, float>> _velVerletKernel;
+        // RK2-4 using callbacks soon
     }
 
     public enum IntegrationMethod
     {
-        Euler, Verlet, VelVerlet,
-        RK, RK2, RK3, RK4
+        Euler, Verlet, VelVerlet
     }
 }

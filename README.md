@@ -1,6 +1,6 @@
 # Lazulite
 A fast & powerful scientific computing stack for C#, built on GPU acceleration.
-## `Lavelle.Lazulite` Overview
+## `Lavelle.Lazulite`
 Lazulite is a GPU acceleration library built on [ILGPU](ilgpu.net), handling automatic buffer pooling and lazy kernel initialization. 
 It uses remotes (objects stored on the compute device) to handle computation entirely on the compute device before syncing back, minimizing the sync costs.
 With it, GPU programming becomes simple:
@@ -28,7 +28,31 @@ class RemoteIntArray(MemoryBuffer1D<int, Stride1D.Dense> buffer, BufferPool<int>
     protected override int[] ConvertToRaw(int[] host) => host;
 }
 ```
-## `Lavelle.Linalg32`, `Lavelle.Calc32`, and `Lavelle.Stats32` Overview
-`Linalg32`, `Calc32`, and `Stats32` host various extension methods and classes implementing Lazulite's primitives, including numerical/statistical methods, tensor operations, and more.
+Remotes are managed by Lazulite itself; all you need to implement is the conversion from the underlying flattened array of elements (for exmample, a `byte[]`) to the object you're representing and vice versa.
+Lazulite serves as the base of the Lazulite stack, providing easy GPU acceleration to strengthen the rest of the libraries.
+## `Lavelle.Linalg32`
+`Linalg32` is a float-based library handling tensor operations, implementing elementwise ops as well as methods like the determinant and decompositions.
+Using it is easy:
+```
+using Lavelle.Lazulite;
+using Lavelle.Linalg32;
 
-You can find the docs for all four packages [here](https://lavelle.gitbook.io/lazulite-documentation).
+using var lctx = new LazuliteContext().EnableLinalg32();
+
+var scalar = lctx.GetScalar(cleared: false); 
+var vector = lctx.GetVector(5);
+var matrix = lctx.GetMatrix(2, 2);
+
+using var a = lctx.GetVector(3);
+using var b = lctx.GetVector(3);
+using var sum = lctx.Add(a, b);
+using var product = lctx.Multiply(a, b);
+
+using var result1 = lctx.GetVector(3);
+lctx.Divide(a, b, r: result1);
+using var result2 = lctx.GetVector(3);
+lctx.Subtract(a, b, result2);
+```
+`Linalg32` also integrates cuBLAS for standard operations, dramatically increasing compute speed.
+
+You can find the docs for both packages [here](https://lavelle.gitbook.io/lazulite-documentation).
