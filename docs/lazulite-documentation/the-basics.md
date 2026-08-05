@@ -56,6 +56,17 @@ kernel.Call(3, remote.Buffer); // we'll call it with an extent of 3 (3 elements)
 ```
 {% endcode %}
 
+{% hint style="info" %}
+Standard pratice is to include a `GlobalUsings.cs` file with the following to make kernel signatures less verbose:
+
+{% code overflow="wrap" %}
+```
+global using FAV = ILGPU.Runtime.ArrayView1D<float, ILGPU.Stride1D.Dense>;
+global using FMB = ILGPU.Runtime.MemoryBuffer1D<float, ILGPU.Stride1D.Dense>;
+```
+{% endcode %}
+{% endhint %}
+
 The `LazuliteKernel` class takes a type parameter equal to the signature of the method it's running, which is always an action starting with an ILGPU `Index1D`. The `ArrayView1D<int, Stride1D.Dense>` is the view into the remote object's memory, which is an array of `int`s.
 
 Now that we've modified our array, we can finally retrieve it with `.Get`:
