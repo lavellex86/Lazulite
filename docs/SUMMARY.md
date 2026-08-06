@@ -22,9 +22,7 @@
   * [RemoteVector](linalg32-api-reference/remotetensor/remotevector.md)
   * [RemoteMatrix](linalg32-api-reference/remotetensor/remotematrix.md)
 * [LinalgExtensions](linalg32-api-reference/linalgextensions.md)
-* [Examples](linalg32-api-reference/examples/README.md)
-  * [Quick Ops](linalg32-api-reference/examples/quick-ops.md)
-  * [Feed Forward Layer](linalg32-api-reference/examples/feed-forward-layer.md)
+* [Examples](linalg32-api-reference/examples.md)
 
 ## Calc32 API Reference
 

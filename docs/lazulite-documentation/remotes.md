@@ -55,6 +55,8 @@ Console.WriteLine($"{redCopy.Length}, {redCopy.Disposed}, {redCopy.Disposable}")
 
 If a remote is flagged non-disposable, calls to `.Dispose` will be ignored, meaning the buffer will not be returned to the pool.
 
+Standard practice is to leave remotes on the compute device as long as possible; you want to `.Get` the smallest possible result. For example, you might return the sum of elements in an array rather than bringing the array to the CPU, then summing.
+
 {% hint style="info" %}
 You can view the full script for this page [here](https://github.com/lavellex86/Lazulite/blob/main/Tests/DocsExample/Program.cs).
 {% endhint %}
