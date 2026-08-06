@@ -9,7 +9,7 @@ namespace Lavelle.Stats32
 {
     public partial class StatsContext
     {
-        // bernoulli, binomial, poisson, beta, gamma, chi-squared next
+        // binomial, poisson, beta, gamma, chi-squared
 
         public RemoteVector UniformDistribution(int n, ulong? seed = null, RemoteVector? r = null)
         {
@@ -34,7 +34,16 @@ namespace Lavelle.Stats32
             return r;
         }
 
+        public RemoteVector BernoulliDistribution(int n, float p, ulong? seed = null, RemoteVector? r = null)
+        {
+            r ??= LContext.GetVector(n);
+            using var uniform = UniformDistribution(n, seed);
+            _bernoulliKernel.Call(n, r, uniform, p);
+            return r;
+        }
+
         private LazuliteKernel<Action<Index1D, FAV, ulong>> _pcgKernel;
         private LazuliteKernel<Action<Index1D, FAV, ulong, float, float>> _normalKernel;
+        private LazuliteKernel<Action<Index1D, FAV, FAV, float>> _bernoulliKernel;
     }
 }

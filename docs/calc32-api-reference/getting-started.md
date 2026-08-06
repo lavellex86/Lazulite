@@ -28,4 +28,4 @@ var f2 = new RemoteVector[]
 var initialF2 = lctx.GetVector(3).Set([0, 0, 0]).AsVector(); // set F(0)
 var F2 = cctx.EulerIntegrate(f2, initialF2, 0.01f); // integrate with dx = 0.01f
 ```
-with `F2` as the integral (or antiderivative) of `f2`.
+with `F2` as the integral (or antiderivative) of `f2`. Methods that refer to `df` are referring to the first derivative of the function, or the second derivative of the integral.

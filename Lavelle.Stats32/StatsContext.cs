@@ -23,6 +23,7 @@ namespace Lavelle.Stats32
                 r[2 * i] = mag * XMath.Cos(2f * XMath.PI * u2) * sigma + mu;
                 if (2 * i + 1 < r.Length) r[2 * i + 1] = mag * XMath.Sin(2f * XMath.PI * u2) * sigma + mu;
             }, lctx);
+            _bernoulliKernel = new((i, r, u, p) => r[i] = u[i] < p ? 1f : 0f, lctx);
         }
 
         private static float Pcg(ulong seed, ulong i)
