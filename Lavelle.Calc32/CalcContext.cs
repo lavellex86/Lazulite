@@ -6,10 +6,19 @@ using System.Text;
 
 namespace Lavelle.Calc32
 {
+    /// <summary>
+    /// The context over `Calc32`'s numerical methods.
+    /// </summary>
     public partial class CalcContext
     {
+        /// <summary>
+        /// The Lazulite context over the `CalcContext`.
+        /// </summary>
         public LazuliteContext LContext { get; set; } 
 
+        /// <summary>
+        /// Creates a new `CalcContext` under a `LazuliteContext` <paramref name="lctx"/>.
+        /// </summary>
         public CalcContext(LazuliteContext lctx)
         {
             LContext = lctx;
@@ -21,6 +30,6 @@ namespace Lavelle.Calc32
                 F[i] = FPrev[i] + fPrev[i] * dx + 0.5f * dfPrev[i] * dx * dx;
                 f[i] = fPrev[i] + 0.5f * (dfPrev[i] + df[i]) * dx;
             }, lctx);
-    }
+        }
     }
 }

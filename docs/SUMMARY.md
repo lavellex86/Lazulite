@@ -30,5 +30,3 @@
 
 * [Getting Started](calc32-api-reference/getting-started.md)
 * [CalcContext](calc32-api-reference/calccontext.md)
-* [Examples](calc32-api-reference/examples/README.md)
-  * [ODEs](calc32-api-reference/examples/odes.md)

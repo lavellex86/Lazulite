@@ -376,7 +376,7 @@ public partial class LinalgExtensions
     /// Reduces a matrix into a vector by summing each column across rows, then adds the result to <paramref name="r"/>.
     /// </summary>
     public static RemoteTensor<float[]> NarrowcastVectorMatrixAdd(this LazuliteContext _, RemoteTensor<float[,]> m, RemoteTensor<float[]> r) =>
-        Encase(r, r, (k, _r) => k.NarrowcastVectorMatrixAdd.Call(r.Length, _r, m, m.Shape[0]));
+        Encase(r, r, (k, _r) => k.NarrowcastVectorMatrixAddKernel.Call(r.Length, _r, m, m.Shape[0]));
 
     /// <summary>
     /// Takes the dot product of two vectors.

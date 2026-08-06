@@ -7,12 +7,31 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>Lavelle.Calc32</PackageId>
     <Title>Lavelle.Calc32</Title>
-    <Version>2.2.4.0</Version>
+    <Version>2.2.5.0</Version>
     <Authors>Julian Lavelle</Authors>
+    <Description>Numerical integration and differentiation for C#, built on Lazulite.</Description>
+    <PackageProjectUrl>https://github.com/lavellex86/Lazulite</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/lavellex86/Lazulite.git</RepositoryUrl>
+    <PackageReleaseNotes>Updated to linalg32 2.5.0, added differences</PackageReleaseNotes>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lavelle.Linalg32" Version="2.4.1" />
+    <None Include="..\..\Celestite\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\Celestite\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lavelle.Linalg32" Version="2.5.0" />
   </ItemGroup>
 
 </Project>

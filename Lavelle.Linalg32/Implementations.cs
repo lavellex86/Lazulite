@@ -16,44 +16,43 @@ internal partial class Implementations
     internal static void Multiply(Index1D i, FAV r, FAV a, FAV b) => r[i] = a[i] * b[i];
     internal static void Divide(Index1D i, FAV r, FAV a, FAV b) => r[i] = a[i] / b[i];
 
-    internal static void AddScalar(Index1D i, FAV r, FAV a, float scalar) => r[i] = a[i] + scalar;
-    internal static void SubtractScalar(Index1D i, FAV r, FAV a, float scalar) => r[i] = a[i] - scalar;
-    internal static void MultiplyScalar(Index1D i, FAV r, FAV a, float scalar) => r[i] = a[i] * scalar;
-    internal static void DivideScalar(Index1D i, FAV r, FAV a, float scalar) => r[i] = a[i] / scalar;
+    internal static void AddScalar(Index1D i, FAV r, FAV x, float scalar) => r[i] = x[i] + scalar;
+    internal static void SubtractScalar(Index1D i, FAV r, FAV x, float scalar) => r[i] = x[i] - scalar;
+    internal static void MultiplyScalar(Index1D i, FAV r, FAV x, float scalar) => r[i] = x[i] * scalar;
+    internal static void DivideScalar(Index1D i, FAV r, FAV x, float scalar) => r[i] = x[i] / scalar;
 
-    internal static void Exp(Index1D i, FAV r, FAV a) => r[i] = XMath.Exp(a[i]);
-    internal static void Log(Index1D i, FAV r, FAV a) => r[i] = XMath.Log(a[i]);
-    internal static void Sqrt(Index1D i, FAV r, FAV a) => r[i] = XMath.Sqrt(a[i]);
-    internal static void Sin(Index1D i, FAV r, FAV a) => r[i] = XMath.Sin(a[i]);
-    internal static void Cos(Index1D i, FAV r, FAV a) => r[i] = XMath.Cos(a[i]);
-    internal static void Tan(Index1D i, FAV r, FAV a) => r[i] = XMath.Tan(a[i]);
-    internal static void Sinh(Index1D i, FAV r, FAV a) => r[i] = XMath.Sinh(a[i]);
-    internal static void Cosh(Index1D i, FAV r, FAV a) => r[i] = XMath.Cosh(a[i]);
-    internal static void Tanh(Index1D i, FAV r, FAV a) => r[i] = XMath.Tanh(a[i]);
+    internal static void Exp(Index1D i, FAV r, FAV x) => r[i] = XMath.Exp(x[i]);
+    internal static void Log(Index1D i, FAV r, FAV x) => r[i] = XMath.Log(x[i]);
+    internal static void Sqrt(Index1D i, FAV r, FAV x) => r[i] = XMath.Sqrt(x[i]);
+    internal static void Sin(Index1D i, FAV r, FAV x) => r[i] = XMath.Sin(x[i]);
+    internal static void Cos(Index1D i, FAV r, FAV x) => r[i] = XMath.Cos(x[i]);
+    internal static void Tan(Index1D i, FAV r, FAV x) => r[i] = XMath.Tan(x[i]);
+    internal static void Sinh(Index1D i, FAV r, FAV x) => r[i] = XMath.Sinh(x[i]);
+    internal static void Cosh(Index1D i, FAV r, FAV x) => r[i] = XMath.Cosh(x[i]);
+    internal static void Tanh(Index1D i, FAV r, FAV x) => r[i] = XMath.Tanh(x[i]);
 
-    internal static void Log10(Index1D i, FAV r, FAV a) => r[i] = XMath.Log10(a[i]);
-    internal static void Log2(Index1D i, FAV r, FAV a) => r[i] = XMath.Log2(a[i]);
-    internal static void Pow(Index1D i, FAV r, FAV a, FAV b) => r[i] = XMath.Pow(a[i], b[i]);
-    internal static void PowScalar(Index1D i, FAV r, FAV a, float exponent) => r[i] = XMath.Pow(a[i], exponent);
+    internal static void Log10(Index1D i, FAV r, FAV x) => r[i] = XMath.Log10(x[i]);
+    internal static void Log2(Index1D i, FAV r, FAV x) => r[i] = XMath.Log2(x[i]);
+    internal static void Pow(Index1D i, FAV r, FAV x, FAV b) => r[i] = XMath.Pow(x[i], b[i]);
+    internal static void PowScalar(Index1D i, FAV r, FAV x, float exponent) => r[i] = XMath.Pow(x[i], exponent);
 
-    internal static void Abs(Index1D i, FAV r, FAV a) => r[i] = XMath.Abs(a[i]);
-    internal static void Floor(Index1D i, FAV r, FAV a) => r[i] = XMath.Floor(a[i]);
-    internal static void Ceiling(Index1D i, FAV r, FAV a) => r[i] = XMath.Ceiling(a[i]);
-    internal static void Round(Index1D i, FAV r, FAV a) => r[i] = XMath.Round(a[i]);
-    internal static void Truncate(Index1D i, FAV r, FAV a) => r[i] = XMath.Truncate(a[i]);
-    internal static void Sign(Index1D i, FAV r, FAV a) => r[i] = XMath.Sign(a[i]);
+    internal static void Abs(Index1D i, FAV r, FAV x) => r[i] = XMath.Abs(x[i]);
+    internal static void Floor(Index1D i, FAV r, FAV x) => r[i] = XMath.Floor(x[i]);
+    internal static void Ceiling(Index1D i, FAV r, FAV x) => r[i] = XMath.Ceiling(x[i]);
+    internal static void Round(Index1D i, FAV r, FAV x) => r[i] = XMath.Round(x[i]);
+    internal static void Truncate(Index1D i, FAV r, FAV x) => r[i] = XMath.Truncate(x[i]);
+    internal static void Sign(Index1D i, FAV r, FAV x) => r[i] = XMath.Sign(x[i]);
 
-    internal static void Min(Index1D i, FAV r, FAV a, FAV b) => r[i] = XMath.Min(a[i], b[i]);
-    internal static void Max(Index1D i, FAV r, FAV a, FAV b) => r[i] = XMath.Max(a[i], b[i]);
-    internal static void MinScalar(Index1D i, FAV r, FAV a, float scalar) => r[i] = XMath.Min(a[i], scalar);
-    internal static void MaxScalar(Index1D i, FAV r, FAV a, float scalar) => r[i] = XMath.Max(a[i], scalar);
+    internal static void Min(Index1D i, FAV r, FAV x, FAV b) => r[i] = XMath.Min(x[i], b[i]);
+    internal static void Max(Index1D i, FAV r, FAV x, FAV b) => r[i] = XMath.Max(x[i], b[i]);
+    internal static void MinScalar(Index1D i, FAV r, FAV x, float scalar) => r[i] = XMath.Min(x[i], scalar);
+    internal static void MaxScalar(Index1D i, FAV r, FAV x, float scalar) => r[i] = XMath.Max(x[i], scalar);
 
-    internal static void Negate(Index1D i, FAV r, FAV a) => r[i] = -a[i];
+    internal static void Negate(Index1D i, FAV r, FAV x) => r[i] = -x[i];
 
     public static void OuterProduct(Index1D index, FAV r, FAV a, FAV b, float alpha, float beta)
     {
-        var j = index % b.IntLength;
-        var i = index / b.IntLength;
+        var (i, j) = (index % b.IntLength, index / b.IntLength);
         r[index] = alpha * a[i] * b[j] + beta * r[index];
     }
 

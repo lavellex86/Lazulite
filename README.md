@@ -39,20 +39,12 @@ using Lavelle.Linalg32;
 
 using var lctx = new LazuliteContext().EnableLinalg32();
 
-var scalar = lctx.GetScalar(cleared: false); 
-var vector = lctx.GetVector(5);
-var matrix = lctx.GetMatrix(2, 2);
-
 using var a = lctx.GetVector(3);
 using var b = lctx.GetVector(3);
 using var sum = lctx.Add(a, b);
 using var product = lctx.Multiply(a, b);
-
-using var result1 = lctx.GetVector(3);
-lctx.Divide(a, b, r: result1);
-using var result2 = lctx.GetVector(3);
-lctx.Subtract(a, b, result2);
 ```
 `Linalg32` also integrates cuBLAS for standard operations, dramatically increasing compute speed.
 
+## Documentation
 You can find the docs for both packages [here](https://lavelle.gitbook.io/lazulite-documentation).
