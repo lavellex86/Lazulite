@@ -45,6 +45,34 @@ using var sum = lctx.Add(a, b);
 using var product = lctx.Multiply(a, b);
 ```
 `Linalg32` also integrates cuBLAS for standard operations, dramatically increasing compute speed.
+## `Lavelle.Calc32`
+`Calc32` implements float-based calculus methods for tensors, allowing numerical differentation and integration on the GPU:
+```csharp
+using Lavelle.Calc32;
+using Lavelle.Lazulite;
+using Lavelle.Linalg32;
+
+var lctx = new LazuliteContext();
+var cctx = new CalcContext(lctx);
+
+var f1 = new RemoteVector[]
+{
+    lctx.GetVector(1).Set([1]).AsVector(),
+    lctx.GetVector(1).Set([2]).AsVector(),
+    lctx.GetVector(1).Set([3]).AsVector(),
+    lctx.GetVector(1).Set([4]).AsVector()
+};
+var df1 = cctx.Differentiate(f1, 0.01f);
+
+var f2 = new RemoteVector[]
+{
+    lctx.GetVector(3).Set([1, 1, 1]).AsVector(),
+    lctx.GetVector(3).Set([2, 2, 2]).AsVector(),
+    lctx.GetVector(3).Set([1, 1, 1]).AsVector()
+};
+var initialF2 = lctx.GetVector(3).Set([0, 0, 0]).AsVector();
+var F2 = cctx.EulerIntegrate(f2, initialF2, 0.01f);
+```
 
 ## Documentation
-You can find the docs for both packages [here](https://lavelle.gitbook.io/lazulite-documentation).
+You can find the docs for the whole Lazulite stack [here](https://lavelle.gitbook.io/lazulite-documentation).

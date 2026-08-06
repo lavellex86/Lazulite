@@ -9,7 +9,7 @@ namespace Lavelle.Stats32
 {
     public partial class StatsContext
     {
-        // bernoulli, binomial, poisson, beta, gamma, chi-squared
+        // bernoulli, binomial, poisson, beta, gamma, chi-squared next
 
         public RemoteVector UniformDistribution(int n, ulong? seed = null, RemoteVector? r = null)
         {

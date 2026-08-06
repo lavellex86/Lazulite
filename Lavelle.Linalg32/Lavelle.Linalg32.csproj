@@ -10,15 +10,15 @@
     <PackageProjectUrl>https://github.com/lavellex86/Lazulite</PackageProjectUrl>
     <RepositoryUrl>https://github.com/lavellex86/Lazulite.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Version>2.5.0</Version>
+    <Version>2.6.0</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <PackageReleaseNotes>Some fixes</PackageReleaseNotes>
+    <PackageReleaseNotes>Update to lazulite 2.6</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lavelle.Lazulite" Version="2.5.0" />
+    <PackageReference Include="Lavelle.Lazulite" Version="2.6.0" />
   </ItemGroup>
 
   <ItemGroup>
