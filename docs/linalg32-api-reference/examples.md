@@ -1,6 +1,6 @@
 # Examples
 
-### Composite Operations
+### Sample Operations
 
 {% code overflow="wrap" %}
 ```csharp
