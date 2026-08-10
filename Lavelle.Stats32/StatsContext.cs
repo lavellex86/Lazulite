@@ -24,6 +24,16 @@ namespace Lavelle.Stats32
                 if (2 * i + 1 < r.Length) r[2 * i + 1] = mag * XMath.Sin(2f * XMath.PI * u2) * sigma + mu;
             }, lctx);
             _bernoulliKernel = new((i, r, u, p) => r[i] = u[i] < p ? 1f : 0f, lctx);
+            _pearsonKernel = new((i, nomin, denom_var_x, denom_var_y, x_vec, y_vec, x_mean, y_mean) =>
+            {
+                float dx = x_vec[i] - x_mean[0];
+                float dy = y_vec[i] - y_mean[0];
+
+                nomin[i] = dx * dy;
+                denom_var_x[i] = dx * dx;
+                denom_var_y[i] = dy * dy;
+
+            }, lctx);
         }
 
         private static float Pcg(ulong seed, ulong i)
