@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lavelle.Stats32\Lavelle.Stats32.csproj" />
+    <PackageReference Include="Lavelle.Linalg32" Version="2.6.0" />
+    <ProjectReference Include="..\..\Lavelle.Calc32\Lavelle.Calc32.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

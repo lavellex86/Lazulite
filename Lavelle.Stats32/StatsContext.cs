@@ -34,6 +34,10 @@ namespace Lavelle.Stats32
                 denom_var_y[i] = dy * dy;
 
             }, lctx);
+            _spearmanKernel = new((i, result, x_ranked, y_ranked) =>
+            {
+                result[i] = (x_ranked[i] - y_ranked[i]) * (x_ranked[i] - y_ranked[i]);
+            }, lctx);
         }
 
         private static float Pcg(ulong seed, ulong i)

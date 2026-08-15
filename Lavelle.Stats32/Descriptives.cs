@@ -15,7 +15,9 @@ namespace Lavelle.Stats32
         public RemoteScalar Mean(RemoteVector data)
         {
             using var normalized = LContext.DivideScalar(data, data.Length);
-            return LContext.Sum(normalized).AsScalar();
+            var sum = LContext.Sum(normalized).AsScalar();
+            LContext.Synchronize();
+            return sum;
         }
 
         public RemoteScalar Variance(RemoteVector data, bool sample = false)
