@@ -1,4 +1,5 @@
 ﻿using ILGPU;
+using ILGPU.Runtime;
 using Lavelle.Lazulite;
 using Lavelle.Linalg32;
 using System;
@@ -36,6 +37,15 @@ namespace Lavelle.Stats32
             var resultVector = (RemoteVector) LContext.GetVector(n).Set(ranked);
             LContext.Synchronize();
             return resultVector;
+        }
+
+        private RemoteVector GetMatrixRow(RemoteMatrix matrix, int rowIndex)
+        {
+            int numCols = matrix.Shape[1];
+            int offset = rowIndex * numCols;
+            var vec = LContext.GetVector(numCols, true);
+            matrix.Buffer.View.SubView(offset, numCols).CopyTo(vec);
+            return vec;
         }
 
         // pearson, spearman, correlation matrix
@@ -94,6 +104,40 @@ namespace Lavelle.Stats32
             var result = LContext.GetScalar(true);
             LContext.AddScalar(divided_r, 1f, r: result);
 
+            LContext.Synchronize();
+            return result;
+        }
+
+        public RemoteMatrix PearsonMatrix(RemoteMatrix matrix)
+        {
+            var dataVectors = new RemoteVector[matrix.Shape[0]];
+
+            for (int i = 0; i < matrix.Shape[0]; i++)
+            {
+                dataVectors[i] = GetMatrixRow(matrix, i);
+            }
+            int n = dataVectors.Length;
+            float[,] tmp_matrix = new float[n, n];
+
+            for (int i = 0; i < n; i++)
+            {
+               for (int j = i; j < n; j++)
+                {
+                    if (i == j)
+                    {
+                        tmp_matrix[i, j] = 1.0f;
+                    }
+                    else
+                    {
+                        using var correlation = Pearson(dataVectors[i], dataVectors[j]);
+                        float corr_value = correlation.Get();
+                        tmp_matrix[i, j] = corr_value;
+                        tmp_matrix[j, i] = corr_value;
+                    }
+                }
+            }
+            var result = LContext.GetMatrix(n, n, true);
+            result.Set(tmp_matrix);
             LContext.Synchronize();
             return result;
         }
