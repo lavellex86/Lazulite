@@ -1,4 +1,4 @@
-﻿using Lavelle.Lazulite;
+using Lavelle.Lazulite;
 using Lavelle.Stats32;
 using Lavelle.Linalg32;
 
@@ -54,6 +54,20 @@ var matrix2 = lctx.GetMatrix(4, 4)
                             { 14500, 9000, 3500, 7500 }
                         }
                     ).AsMatrix();
+
+// Generate a 100x100 temporary matrix with random sample data
+int size = 100;
+float[,] tmp_mat100 = new float[size, size];
+var rand = new Random(42);
+for (int i = 0; i < size; i++)
+{
+    for (int j = 0; j < size; j++)
+    {
+        tmp_mat100[i, j] = (float)rand.NextDouble() * 100f;
+    }
+}
+// Initiate a 100x100 RemoteMatrix and set the data in GPU memory
+var matrix100 = lctx.GetMatrix(size, size).Set(tmp_mat100).AsMatrix();
 
 lctx.Synchronize();
 using var pearsonResults = sctx.Pearson(vec1[0], vec2[0]);
@@ -126,3 +140,29 @@ for (int i = 0; i < rows2; i++)
     }
     Console.WriteLine();
 }
+
+Console.WriteLine("--- 100x100 Matrix Pearson Correlation ---");
+var sw = System.Diagnostics.Stopwatch.StartNew();
+float[,] pearsonResult100 = sctx.PearsonMatrix(matrix100).Get();
+sw.Stop();
+Console.WriteLine($"100x100 Pearson Correlation Matrix computed in: {sw.ElapsedMilliseconds} ms");
+Console.WriteLine($"Result shape: [{pearsonResult100.GetLength(0)}, {pearsonResult100.GetLength(1)}]");
+Console.WriteLine($"Sample Correlation [0, 1]: {pearsonResult100[0, 1]:F4}");
+Console.WriteLine($"Sample Correlation [45, 50]: {pearsonResult100[45, 50]:F4}");
+Console.WriteLine($"Sample Correlation [99, 98]: {pearsonResult100[99, 98]:F4}");
+
+Console.WriteLine($"Running on: {lctx.Accelerator.Name}");
+Console.WriteLine($"Device Type: {lctx.Accelerator.AcceleratorType}");
+
+Console.WriteLine("--- 100x100 Matrix Spearman Correlation ---");
+var sw1 = System.Diagnostics.Stopwatch.StartNew();
+float[,] spearmanResult100 = sctx.SpearmanMatrix(matrix100).Get();
+sw1.Stop();
+Console.WriteLine($"100x100 Spearman Correlation Matrix computed in: {sw1.ElapsedMilliseconds} ms");
+Console.WriteLine($"Result shape: [{spearmanResult100.GetLength(0)}, {spearmanResult100.GetLength(1)}]");
+Console.WriteLine($"Sample Correlation [0, 1]: {spearmanResult100[0, 1]:F4}");
+Console.WriteLine($"Sample Correlation [45, 50]: {spearmanResult100[45, 50]:F4}");
+Console.WriteLine($"Sample Correlation [99, 98]: {spearmanResult100[99, 98]:F4}");
+
+Console.WriteLine($"Running on: {lctx.Accelerator.Name}");
+Console.WriteLine($"Device Type: {lctx.Accelerator.AcceleratorType}");

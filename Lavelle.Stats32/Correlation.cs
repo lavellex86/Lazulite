@@ -134,7 +134,7 @@ namespace Lavelle.Stats32
                     }
                     else
                     {
-                        using var correlation = Spearman(dataVectors[i], dataVectors[j]);
+                        using var correlation = Pearson(dataVectors[i], dataVectors[j]);
                         float corr_value = correlation.Get();
                         tmp_matrix[i, j] = corr_value;
                         tmp_matrix[j, i] = corr_value;
