@@ -110,6 +110,11 @@ namespace Lavelle.Stats32
 
         public RemoteMatrix PearsonMatrix(RemoteMatrix matrix)
         {
+            if (matrix.Shape[0] != matrix.Shape[1])
+            {
+                throw new ArgumentException("Input matrix must be square for correlation matrix calculation.");
+            }
+
             var dataVectors = new RemoteVector[matrix.Shape[0]];
 
             for (int i = 0; i < matrix.Shape[0]; i++)
@@ -129,7 +134,45 @@ namespace Lavelle.Stats32
                     }
                     else
                     {
-                        using var correlation = Pearson(dataVectors[i], dataVectors[j]);
+                        using var correlation = Spearman(dataVectors[i], dataVectors[j]);
+                        float corr_value = correlation.Get();
+                        tmp_matrix[i, j] = corr_value;
+                        tmp_matrix[j, i] = corr_value;
+                    }
+                }
+            }
+            var result = LContext.GetMatrix(n, n, true);
+            result.Set(tmp_matrix);
+            LContext.Synchronize();
+            return result;
+        }
+        public RemoteMatrix SpearmanMatrix(RemoteMatrix matrix)
+        {
+            if (matrix.Shape[0] != matrix.Shape[1])
+            {
+                throw new ArgumentException("Input matrix must be square for correlation matrix calculation.");
+            }
+
+            var dataVectors = new RemoteVector[matrix.Shape[0]];
+
+            for (int i = 0; i < matrix.Shape[0]; i++)
+            {
+                dataVectors[i] = GetMatrixRow(matrix, i);
+            }
+            int n = dataVectors.Length;
+            float[,] tmp_matrix = new float[n, n];
+
+            for (int i = 0; i < n; i++)
+            {
+               for (int j = i; j < n; j++)
+                {
+                    if (i == j)
+                    {
+                        tmp_matrix[i, j] = 1.0f;
+                    }
+                    else
+                    {
+                        using var correlation = Spearman(dataVectors[i], dataVectors[j]);
                         float corr_value = correlation.Get();
                         tmp_matrix[i, j] = corr_value;
                         tmp_matrix[j, i] = corr_value;

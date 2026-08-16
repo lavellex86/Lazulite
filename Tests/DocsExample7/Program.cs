@@ -45,6 +45,16 @@ var matrix1 = lctx.GetMatrix(4, 4)
                         }
                     ).AsMatrix();
 
+var matrix2 = lctx.GetMatrix(4, 4)
+                .Set(new float[,]
+                        {
+                            { 4, 1, 3, 2 },
+                            { 22, 104, 50, 500 },
+                            { 10000, 3400, 750, 5000 },
+                            { 14500, 9000, 3500, 7500 }
+                        }
+                    ).AsMatrix();
+
 lctx.Synchronize();
 using var pearsonResults = sctx.Pearson(vec1[0], vec2[0]);
 using var pearsonResults2 = sctx.Pearson(vec1[1], vec2[1]);
@@ -71,7 +81,7 @@ Console.WriteLine($"Pearson correlation between vec3[0] and vec4[0]: {pearsonVal
 Console.WriteLine($"Pearson correlation between vec3[3] and vec4[3]: {pearsonValue5}");
 Console.WriteLine($"Spearman correlation between vec3[3] and vec4[3]: {spearmanValue}");
 
-float[,] data = new float[vec1.Length, vec1.Length];
+float[,] data = new float[matrix1.Shape[0], matrix1.Shape[1]];
 data = sctx.PearsonMatrix(matrix1).Get();
 int rows = data.GetLength(0);
 int cols = data.GetLength(1);
@@ -90,6 +100,29 @@ for (int i = 0; i < rows; i++)
     for (int j = 0; j < cols; j++)
     {
         Console.Write($"{data[i, j],7:F4} ");
+    }
+    Console.WriteLine();
+}
+
+float[,] data2 = new float[matrix2.Shape[0], matrix2.Shape[1]];
+data2 = sctx.SpearmanMatrix(matrix2).Get();
+int rows2 = data2.GetLength(0);
+int cols2 = data2.GetLength(1);
+
+Console.WriteLine("--- Spearman Correlation Matrix ---");
+Console.Write("       ");
+for (int j = 0; j < cols2; j++)
+{
+    Console.Write($"V{j,-7}");
+}
+
+Console.WriteLine();
+for (int i = 0; i < rows2; i++)
+{
+    Console.Write($"V{i,-4} ");
+    for (int j = 0; j < cols2; j++)
+    {
+        Console.Write($"{data2[i, j],7:F4} ");
     }
     Console.WriteLine();
 }
