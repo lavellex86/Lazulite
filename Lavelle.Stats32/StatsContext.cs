@@ -32,7 +32,6 @@ namespace Lavelle.Stats32
                 nomin[i] = dx * dy;
                 denom_var_x[i] = dx * dx;
                 denom_var_y[i] = dy * dy;
-
             }, lctx);
             _spearmanKernel = new((i, result, x_ranked, y_ranked) =>
             {

@@ -49,7 +49,6 @@ namespace Lavelle.Stats32
         }
 
         // pearson, spearman, correlation matrix
-
         public RemoteScalar Pearson(RemoteVector x_data, RemoteVector y_data)
         {
             using var x_mean = Mean(x_data);
