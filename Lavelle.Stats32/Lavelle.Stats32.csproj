@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lavelle.Linalg32" Version="2.4.2" />
+    <PackageReference Include="Lavelle.Linalg32" Version="2.6.0" />
   </ItemGroup>
 
 </Project>
